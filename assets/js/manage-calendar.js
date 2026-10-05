@@ -308,5 +308,5 @@
     });
   }
 
-  DDM.register(/^#\/calendar$/, render);
+  DDM.register(/^\/calendar$/, render);
 })();

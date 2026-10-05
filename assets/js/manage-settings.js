@@ -481,5 +481,5 @@
     });
   }
 
-  DDM.register(/^#\/settings$/, render);
+  DDM.register(/^\/settings$/, render);
 })();

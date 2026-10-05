@@ -332,3 +332,19 @@ button.cal__cell:hover, a.cal__cell:hover { background: var(--ink-800); }
   .portal-cols { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-6); }
   .portal-col--side { position: sticky; top: calc(var(--header-h) + var(--s-4)); max-height: calc(100dvh - var(--header-h) - var(--s-6)); overflow-y: auto; }
 }
+
+/* ---------- messages: iMessage style (own messages right/blue, other person left/grey) ---------- */
+.thread { gap: 3px; padding: var(--s-3) var(--s-2); }
+.bubble { max-width: min(78%, 30rem); padding: 8px 14px; border-radius: 20px; font-size: 1rem; line-height: 1.35; }
+.bubble + .bubble { margin-top: 0; }
+.bubble--customer { border-bottom-right-radius: 6px; }
+.bubble--staff { border-bottom-left-radius: 6px; }
+.thread--staff .bubble--customer { border-bottom-left-radius: 6px; border-bottom-right-radius: 20px; }
+.thread--staff .bubble--staff { border-bottom-right-radius: 6px; border-bottom-left-radius: 20px; }
+.bubble__meta { margin-top: 2px; font-size: 0.72rem; opacity: .65; }
+.bubble--customer .bubble__meta { text-align: right; }
+.thread--staff .bubble--customer .bubble__meta { text-align: left; }
+.thread--staff .bubble--staff .bubble__meta { text-align: right; }
+.composer textarea { border-radius: 22px; padding: 10px 16px; }
+.composer .btn { border-radius: 999px; min-width: 5rem; }
+

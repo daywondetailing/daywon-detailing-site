@@ -456,6 +456,6 @@
     load();
   }
 
-  DDM.register(/^#\/customers$/, renderList);
-  DDM.register(/^#\/c\/([0-9a-fA-F-]{36})$/, renderProfile);
+  DDM.register(/^\/customers$/, renderList);
+  DDM.register(/^\/c\/([0-9a-fA-F-]{36})$/, renderProfile);
 })();
