@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Manage | Daywon Detailing</title>
+  <meta name="description" content="Daywon Detailing staff dashboard.">
+  <meta name="theme-color" content="#05070A">
+  <link rel="icon" href="assets/img/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/portal.css">
+  <link rel="stylesheet" href="assets/css/manage.css">
+</head>
+<body class="page-manage">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="app-shell" id="app">
+  <header class="topbar">
+    <a class="topbar__brand brand" href="#/requests"><span class="brand__mark"><img src="assets/img/logo.jpg" alt="" width="44" height="44"></span><span class="brand__name">Daywon Detailing</span></a>
+    <span class="topbar__title" id="topbar-title">Manage</span>
+    <div class="topbar__actions">
+      <button type="button" class="btn btn--ghost" id="signout-btn" hidden><svg class="icon" aria-hidden="true"><use href="#i-logout"/></svg><span>Sign out</span></button>
+    </div>
+  </header>
+  <main id="main" class="app-shell__main">
+    <p class="visually-hidden" id="route-live" aria-live="polite"></p>
+    <section id="view-login" aria-labelledby="h-login" hidden>
+      <h1 id="h-login" tabindex="-1">Manage sign-in</h1>
+      <p class="muted" id="login-lede">Staff only. Enter the staff email and we'll email you a code.</p>
+      <div id="login-box"></div>
+    </section>
+    <section id="view-boot" aria-labelledby="h-boot">
+      <h1 id="h-boot" tabindex="-1">Loading</h1>
+      <p class="muted">One moment.</p>
+    </section>
+    <div id="route-root" hidden></div>
+  </main>
+  <nav class="tabbar" id="tabbar" aria-label="Manage sections" hidden></nav>
+</div>
+<noscript><p class="container">This page needs JavaScript.</p></noscript>
+
+<script src="assets/js/icons.js" defer></script>
+<script src="assets/js/config.js" defer></script>
+<script src="assets/js/data.js" defer></script>
+<script src="assets/js/site.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
+<script src="assets/js/portal-core.js" defer></script>
+<script src="assets/js/scheduler.js" defer></script>
+<script src="assets/js/manage.js" defer></script>
+<script src="assets/js/manage-requests.js" defer></script>
+<script src="assets/js/manage-calendar.js" defer></script>
+<script src="assets/js/manage-customers.js" defer></script>
+<script src="assets/js/manage-settings.js" defer></script>
+</body>
+</html>

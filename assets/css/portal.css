@@ -301,6 +301,33 @@ button.cal__cell:hover, a.cal__cell:hover { background: var(--ink-800); }
   .portal-main .sched { padding: var(--s-2); }
   .portal .actions > .btn, .portal .next-step__actions > .btn { flex: 1 1 100%; }
 }
+/* manage: requests (T5) */
+.page-manage .topbar__title { font-weight: 600; color: var(--ink-300); font-size: var(--fs-sm); }
+@media (max-width: 599px) { .page-manage .topbar__brand .brand__name { display: none; } }
+.app-shell__main h1:focus { outline: none; }
+.manage-filters { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-4); }
+.manage-filters .chip { min-height: 44px; }
+.manage-search { max-width: 28rem; margin-bottom: var(--s-4); }
+.manage-linkpaste { max-width: 28rem; margin-top: var(--s-4); display: grid; gap: var(--s-3); }
+.manage-contact { margin: var(--s-4) 0; }
+.manage-bar { display: grid; gap: var(--s-3); margin: var(--s-4) 0; }
+.manage-bar > .btn { justify-self: start; }
+.manage-bar__wait { display: flex; align-items: center; gap: var(--s-2); margin: 0; color: var(--warn); font-weight: 600; }
+.manage-form { display: grid; gap: var(--s-4); margin-bottom: var(--s-5); }
+.manage-form > * + * { margin-top: 0; }
+.manage-form .sched { max-width: 100%; }
+.manage-quick { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.manage-methods { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.manage-assign { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); }
+.manage-notes { list-style: none; padding: 0; margin: 0 0 var(--s-4); display: grid; gap: var(--s-3); }
+.manage-notes li { display: grid; gap: 2px; }
+.manage-paid > p, .manage-pending > p { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.manage-detail { margin-top: var(--s-5); }
+.thread--staff .bubble--customer { align-self: flex-start; background: var(--ink-800); color: var(--ink-100); }
+.thread--staff .bubble--staff { align-self: flex-end; background: var(--blue-600); color: #fff; }
+@media (max-width: 480px) {
+  .manage-bar > .btn, .manage-contact > .btn, .manage-bar__more > .btn { flex: 1 1 100%; justify-self: stretch; }
+}
 @media (min-width: 960px) {
   .portal-cols { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-6); }
   .portal-col--side { position: sticky; top: calc(var(--header-h) + var(--s-4)); max-height: calc(100dvh - var(--header-h) - var(--s-6)); overflow-y: auto; }
