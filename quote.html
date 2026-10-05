@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request a Quote | Daywon Detailing</title>
+  <meta name="description" content="Tell us about your vehicle and address in the Silver Spring, MD area and we'll reply with a quote.">
+  <meta name="theme-color" content="#05070A">
+  <meta property="og:title" content="Request a Quote | Daywon Detailing">
+  <meta property="og:description" content="Tell us about your vehicle and address in the Silver Spring, MD area and we'll reply with a quote.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/img/logo.jpg">
+  <link rel="icon" href="assets/img/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="page-quote">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="container site-header__inner">
+  <a class="brand" href="index.html"><span class="brand__mark"><img src="assets/img/logo.jpg" alt="" width="44" height="44"></span><span class="brand__name">Daywon Detailing</span></a>
+  <nav class="site-nav" aria-label="Main"><ul>
+    <li><a href="services.html">Services</a></li><li><a href="index.html#area">Service area</a></li>
+    <li><a href="index.html#about">About</a></li><li><a href="index.html#faq">FAQ</a></li><li><a href="index.html#contact">Contact</a></li>
+  </ul></nav>
+  <a class="btn btn--primary site-header__cta" data-cta href="quote.html">Request a quote</a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
+</div><div id="mobile-nav" class="mobile-nav" hidden><ul>
+    <li><a href="services.html">Services</a></li><li><a href="index.html#area">Service area</a></li>
+    <li><a href="index.html#about">About</a></li><li><a href="index.html#faq">FAQ</a></li><li><a href="index.html#contact">Contact</a></li>
+  </ul><a class="btn btn--primary" data-cta href="quote.html">Request a quote</a><a class="mobile-nav__tel" href="tel:+12405795092" data-contact-href="tel"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>Call or text <span data-contact="phone">240-579-5092</span></a></div></header>
+
+<main id="main">
+  <section class="page-header band--dark">
+    <div class="container">
+      <h1>Request a quote</h1>
+      <p class="page-header__sub">Tell us about your vehicle and where you'd like the detail. We reply within 1 to 2 hours with a price for your vehicle and confirm your time. You pay after the job is done.</p>
+      <p class="muted">Already sent one? <a href="my-request.html">Check your request</a></p>
+    </div>
+  </section>
+
+  <section class="band--dark" style="padding-top: 0">
+    <div class="container quote-layout">
+
+      <div id="quote-form-wrap">
+        <form id="quote-form" novalidate>
+          <div id="form-alerts"></div>
+
+          <fieldset class="form-group">
+            <legend>You</legend>
+            <div class="field" data-field="name">
+              <label class="field__label" for="f-name">Full name</label>
+              <input type="text" id="f-name" name="name" autocomplete="name">
+            </div>
+            <div class="form-row">
+              <div class="field" data-field="phone">
+                <label class="field__label" for="f-phone">Phone</label>
+                <input type="tel" id="f-phone" name="phone" autocomplete="tel" inputmode="tel">
+              </div>
+              <div class="field" data-field="email">
+                <label class="field__label" for="f-email">Email</label>
+                <input type="email" id="f-email" name="email" autocomplete="email">
+              </div>
+            </div>
+            <div class="field" data-field="contact_method" role="radiogroup" aria-labelledby="l-contact">
+              <span class="field__label" id="l-contact">Best way to reach you</span>
+              <div class="choice-grid choice-grid--inline">
+                <label class="choice"><input type="radio" name="contact_method" value="Text" checked><span class="choice__body"><span class="choice__title">Text</span></span></label>
+                <label class="choice"><input type="radio" name="contact_method" value="Call"><span class="choice__body"><span class="choice__title">Call</span></span></label>
+                <label class="choice"><input type="radio" name="contact_method" value="Email"><span class="choice__body"><span class="choice__title">Email</span></span></label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Vehicle</legend>
+            <div class="form-row">
+              <div class="field" data-field="vehicle_year">
+                <label class="field__label" for="f-year">Year <span class="field__optional">(optional)</span></label>
+                <input type="text" id="f-year" name="vehicle_year" inputmode="numeric" maxlength="4">
+              </div>
+              <div class="field" data-field="vehicle_make">
+                <label class="field__label" for="f-make">Make</label>
+                <input type="text" id="f-make" name="vehicle_make" placeholder="Toyota">
+              </div>
+              <div class="field" data-field="vehicle_model">
+                <label class="field__label" for="f-model">Model</label>
+                <input type="text" id="f-model" name="vehicle_model" placeholder="Camry">
+              </div>
+            </div>
+            <div class="field" data-field="vehicle_size" role="radiogroup" aria-labelledby="l-size">
+              <span class="field__label" id="l-size">Size</span>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="vehicle_size" value="Car (sedan, coupe, hatchback)"><span class="choice__body"><span class="choice__title">Car (sedan, coupe, hatchback)</span></span></label>
+                <label class="choice"><input type="radio" name="vehicle_size" value="Small SUV or crossover"><span class="choice__body"><span class="choice__title">Small SUV or crossover</span></span></label>
+                <label class="choice"><input type="radio" name="vehicle_size" value="Large SUV or minivan"><span class="choice__body"><span class="choice__title">Large SUV or minivan</span></span></label>
+                <label class="choice"><input type="radio" name="vehicle_size" value="Pickup truck"><span class="choice__body"><span class="choice__title">Pickup truck</span></span></label>
+                <label class="choice"><input type="radio" name="vehicle_size" value="Other / not sure"><span class="choice__body"><span class="choice__title">Other / not sure</span></span></label>
+              </div>
+            </div>
+            <div class="field" data-field="vehicle_color">
+              <label class="field__label" for="f-color">Color</label>
+              <input type="text" id="f-color" name="vehicle_color">
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Service</legend>
+            <div class="field" data-field="service" role="radiogroup" aria-labelledby="l-service">
+              <span class="field__label" id="l-service">Package</span>
+              <div class="choice-grid" id="service-options"><noscript>Our packages need JavaScript to display. Call or text 240-579-5092 or email daywondetailing@gmail.com for a quote.</noscript></div>
+            </div>
+            <div class="field" id="addons-field">
+              <span class="field__label" id="l-addons">Add-ons <span class="field__optional">(optional)</span></span>
+              <div id="addons-options" role="group" aria-labelledby="l-addons"></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Location</legend>
+            <div class="field" data-field="address_street">
+              <label class="field__label" for="f-street">Street address</label>
+              <input type="text" id="f-street" name="address_street" autocomplete="address-line1">
+            </div>
+            <div class="field" data-field="address_line2">
+              <label class="field__label" for="f-line2">Apt, suite, parking notes <span class="field__optional">(optional)</span></label>
+              <input type="text" id="f-line2" name="address_line2" autocomplete="address-line2">
+            </div>
+            <div class="form-row">
+              <div class="field" data-field="address_city">
+                <label class="field__label" for="f-city">City</label>
+                <input type="text" id="f-city" name="address_city" autocomplete="address-level2">
+              </div>
+              <div class="field" data-field="address_state">
+                <label class="field__label" for="f-state">State</label>
+                <select id="f-state" name="address_state" autocomplete="address-level1">
+                  <option value="MD" selected>MD</option>
+                  <option value="DC">DC</option>
+                  <option value="VA">VA</option>
+                </select>
+              </div>
+              <div class="field" data-field="address_zip">
+                <label class="field__label" for="f-zip">ZIP code</label>
+                <input type="text" id="f-zip" name="address_zip" inputmode="numeric" maxlength="5" autocomplete="postal-code">
+              </div>
+            </div>
+            <div class="field" data-field="in_area">
+              <label class="check"><input type="checkbox" id="f-area" name="in_area" value="yes"><span>This address is within 15 miles of Silver Spring, MD.</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Timing</legend>
+            <p class="field__help">We work Monday, Tuesday, Thursday, Saturday and Sunday from 11 AM to 5 PM, and Wednesday and Friday from 2 PM to 5 PM. Pick a day, then a 30-minute arrival window, so we have time to get to you.</p>
+            <div class="field" data-field="preferred_date" data-widget role="group" aria-labelledby="l-pref">
+              <span class="field__label" id="l-pref">Preferred date and arrival window</span>
+              <div class="sched" data-sched data-prefix="preferred"></div>
+              <input type="hidden" name="preferred_date">
+              <input type="hidden" name="preferred_time">
+              <input type="hidden" name="preferred_start">
+            </div>
+            <div class="field" data-field="backup_date" data-widget role="group" aria-labelledby="l-backup">
+              <span class="field__label" id="l-backup">Backup date and arrival window</span>
+              <p class="field__help">In case your first choice is already taken.</p>
+              <div class="sched" data-sched data-prefix="backup"></div>
+              <input type="hidden" name="backup_date">
+              <input type="hidden" name="backup_time">
+              <input type="hidden" name="backup_start">
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Anything else</legend>
+            <div class="field" data-field="notes">
+              <label class="field__label" for="f-notes">Notes <span class="field__optional">(optional)</span></label>
+              <textarea id="f-notes" name="notes" rows="4" maxlength="1000" placeholder="Pet hair, stains, spills, or anything we should know"></textarea>
+            </div>
+          </fieldset>
+
+          <div class="honeypot" aria-hidden="true"><input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off"></div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary" id="submit-btn">Send quote request</button>
+            <p class="form-note">We reply within 1 to 2 hours by text or email. No payment is taken here: you pay after the job is done.</p>
+          </div>
+        </form>
+      </div>
+
+      <div id="square-wrap" hidden>
+        <h2>Book online</h2>
+        <p>Choose your package and a time on our Square booking page.</p>
+        <div class="actions" id="square-list" style="margin-top: var(--s-5)"></div>
+        <p style="margin-top: var(--s-5)"><a class="btn btn--primary" id="square-main" href="#" target="_blank" rel="noopener">Open booking page</a></p>
+        <p class="muted" style="margin-top: var(--s-5)">Questions? <a href="tel:+12405795092" data-contact-href="tel">Call or text <span data-contact="phone">240-579-5092</span></a></p>
+      </div>
+
+      <aside class="quote-aside panel" aria-labelledby="aside-title">
+        <h2 id="aside-title">What happens next</h2>
+        <ol class="aside-steps">
+          <li>We review your request.</li>
+          <li>We reply within 1 to 2 hours with your quote by text or email, and on your request page.</li>
+          <li>You confirm and we come to you.</li>
+          <li>You pay after the job is done, through Square, including tap to pay on our phone.</li>
+        </ol>
+        <p>Prefer to talk? <a href="tel:+12405795092" data-contact-href="tel">Call or text <span data-contact="phone">240-579-5092</span></a></p>
+        <p><a href="mailto:daywondetailing@gmail.com" data-contact-href="mailto"><span data-contact="email">daywondetailing@gmail.com</span></a></p>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="container">
+  <div class="site-footer__top">
+    <div class="site-footer__brand">
+      <a class="brand" href="index.html"><span class="brand__mark"><img src="assets/img/logo.jpg" alt="" width="96" height="96" loading="lazy"></span><span class="brand__name">Daywon Detailing</span></a>
+      <p class="site-footer__tagline">Mobile car detailing within 15 miles of Silver Spring, MD.</p>
+    </div>
+    <div class="site-footer__cols">
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Pages</h2>
+        <ul class="site-footer__list">
+          <li><a href="services.html">Services</a></li>
+          <li><a data-cta href="quote.html">Request a quote</a></li>
+          <li><a href="index.html#faq">FAQ</a></li>
+          <li><a href="my-request.html">Check my request</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Contact</h2>
+        <ul class="site-footer__list">
+          <li><a href="tel:+12405795092" data-contact-href="tel"><span data-contact="phone">240-579-5092</span></a></li>
+          <li><a href="sms:+12405795092" data-contact-href="sms">Text us</a></li>
+          <li><a href="mailto:daywondetailing@gmail.com" data-contact-href="mailto"><span data-contact="email">daywondetailing@gmail.com</span></a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Follow</h2>
+        <ul class="site-footer__list">
+          <li><a href="https://www.instagram.com/daywondetailing/" data-contact-href="instagram">Instagram</a></li>
+          <li><a href="https://www.tiktok.com/@daywon.detailing" data-contact-href="tiktok">TikTok</a></li>
+          <li><span class="placeholder placeholder--inline" data-placeholder="facebook">Facebook coming soon</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="site-footer__bottom"><span>&copy; <span data-year>2026</span> Daywon Detailing</span></div>
+</div></footer>
+
+<div class="mobile-cta"><a class="btn btn--primary" data-cta href="quote.html">Request a quote</a><a class="btn btn--ghost" href="tel:+12405795092" data-contact-href="tel"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>Call or text</a></div>
+
+<script src="assets/js/icons.js" defer></script>
+<script src="assets/js/config.js" defer></script>
+<script src="assets/js/data.js" defer></script>
+<script src="assets/js/site.js" defer></script>
+<script src="assets/js/services.js" defer></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script defer src="assets/js/portal-core.js"></script>
+<script src="assets/js/scheduler.js" defer></script>
+<script src="assets/js/quote.js" defer></script>
+</body>
+</html>
