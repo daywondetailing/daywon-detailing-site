@@ -526,9 +526,7 @@
         window.sessionStorage.setItem("dd_ref", res.ref ? String(res.ref) : "");
       } catch (e) { /* storage blocked: the portal asks for the email instead */ }
       var target = "my-request.html?r=" + encodeURIComponent(id) + "&new=1";
-      try {
-        window.DD.auth.sendCode(val("email")).then(function () { go(target); }, function () { go(target); });
-      } catch (e2) { go(target); }
+      go(target);   // the customer asks for a login code themselves on the next page
     }
     staffCheck.then(function (isStaff) {
       if (isStaff) { go("manage.html#/r/" + encodeURIComponent(id)); return; }

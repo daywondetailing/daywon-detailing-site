@@ -90,8 +90,8 @@
       return v > 0 ? v : 30;
     }
     function hoursFor(date) {
-      if (staff) return STAFF_HOURS;
       var h = hoursMap && hoursMap[date.getDay()];
+      if (staff && !hoursMap) return STAFF_HOURS;   // settings not loaded: wide fallback; the server still enforces the real hours
       return h && h.length >= 2 ? h : null;
     }
     function offFor(date) {

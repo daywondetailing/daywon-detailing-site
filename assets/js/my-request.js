@@ -164,7 +164,7 @@
       banner.appendChild(DD.icon("i-check"));
       banner.appendChild(el("p", {
         text: (ref ? "Request " + ref + " sent." : "Your request was sent.") +
-          " We reply within 1 to 2 hours. Enter the code we just emailed you to follow it here."
+          " We reply within 1 to 2 hours. To follow it here, enter your email below and tap \"Email me a code\"."
       }));
       banner.hidden = false;
     } else {
