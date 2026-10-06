@@ -218,9 +218,10 @@
     current = { main: main, match: match, query: query };
     if (nowTimer) { clearInterval(nowTimer); nowTimer = null; }
 
-    var v = query.get("v");
+    var qv = function (k) { return query && typeof query.get === "function" ? query.get(k) : (query && query[k] != null ? query[k] : null); };
+    var v = qv("v");
     if (v !== "day" && v !== "week" && v !== "month") v = mql.matches ? "week" : "day";
-    var d = DD.parseYmd(query.get("d")) || today();
+    var d = DD.parseYmd(qv("d")) || today();
     d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     var r = rangeFor(v, d);
     var unit = v;

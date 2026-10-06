@@ -645,3 +645,6 @@ html.js-motion .hero__title.is-sheen::after {
 .field.is-invalid .sched { border-color: var(--danger, #FF8A8A); }
 .sched__slot:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed}
 .sched__slot:disabled:hover{border-color:var(--ink-700)}
+/* header: keep links on one line when the extra My request link is present */
+.site-nav a { white-space: nowrap; }
+@media (max-width: 1180px) { .site-nav a { padding: 0 var(--s-2); } .site-header__cta { white-space: nowrap; } }
