@@ -209,7 +209,7 @@
         db(DD.sb.from("customers").select("id,email,name,phone,contact_method,created_at").eq("id", id).maybeSingle()),
         db(DD.sb.from("vehicles").select("id,year,make,model,size,color").eq("customer_id", id).order("created_at", { ascending: true }).limit(200)),
         db(DD.sb.from("addresses").select("id,street,line2,city,state,zip").eq("customer_id", id).order("created_at", { ascending: true }).limit(200)),
-        db(DD.sb.from("requests").select("id,ref,status,service_id,scheduled_date,scheduled_start,created_at,paid,paid_amount").eq("customer_id", id).order("created_at", { ascending: false }).limit(200)),
+        db(DD.sb.from("requests").select("id,ref,status,service_id,scheduled_date,scheduled_start,created_at,paid,paid_amount,started_at,finished_at,work_started_at,work_seconds").eq("customer_id", id).order("created_at", { ascending: false }).limit(200)),
         db(DD.sb.from("customer_notes").select("id,request_id,body,author_name,created_at").eq("customer_id", id).order("created_at", { ascending: false }).limit(200))
       ]).then(function (r) {
         if (my !== seq) return;
@@ -235,6 +235,16 @@
       var spent = 0;
       s.jobs.forEach(function (j) { if (j.paid && j.paid_amount != null) spent += Number(j.paid_amount); });
       body.appendChild(el("p", { "class": "mg-total" }, [el("span", { "class": "muted", text: "Total spent " }), el("strong", { text: money(spent) })]));
+      var timed = s.jobs.filter(function (j) { return j.status === "done" && (Number(j.work_seconds) || 0) > 0; });
+      if (timed.length) {
+        var sum = 0, longest = 0;
+        timed.forEach(function (j) { var w = Number(j.work_seconds); sum += w; if (w > longest) longest = w; });
+        body.appendChild(el("p", { "class": "mg-total" }, [
+          el("span", { "class": "muted", text: "Average job time " }), el("strong", { text: DDM.durationText(sum / timed.length) }),
+          el("span", { "class": "muted", text: " · Longest " }), el("strong", { text: DDM.durationText(longest) }),
+          el("span", { "class": "muted", text: " · " + timed.length + (timed.length === 1 ? " job timed" : " jobs timed") })
+        ]));
+      }
 
       var panel = el("div", { "class": "panel" });
       body.appendChild(panel);
@@ -387,6 +397,11 @@
     }
 
     /* history */
+    function jobTime(j) {
+      var w = Number(j.work_seconds) || 0;
+      if (j.status === "in_progress") return " · Timer running";
+      return j.status === "done" && w > 0 ? " · Took " + DDM.durationText(w) : "";
+    }
     function historySection(jobs) {
       var sec = el("section", { "class": "mg-sec" });
       sec.appendChild(el("h2", { "class": "portal-sec__title", text: "Job history" }));
@@ -397,7 +412,7 @@
         ul.appendChild(el("li", null, [el("a", { "class": "list-row", href: "#/r/" + j.id }, [
           el("div", { "class": "list-row__main" }, [
             el("span", { "class": "list-row__title", text: DD.service(j.service_id) + " · " + j.ref }),
-            el("span", { "class": "list-row__meta", text: when + (j.paid && j.paid_amount != null ? " · Paid " + money(j.paid_amount) : "") })
+            el("span", { "class": "list-row__meta", text: when + (j.paid && j.paid_amount != null ? " · Paid " + money(j.paid_amount) : "") + jobTime(j) })
           ]),
           el("span", { "class": "list-row__end" }, [el("span", { "class": "chip-status", "data-status": j.status, text: DD.STATUS[j.status] ? DD.STATUS[j.status].staff : j.status })])
         ])]));

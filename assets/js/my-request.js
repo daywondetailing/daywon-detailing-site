@@ -421,7 +421,7 @@
       var when = whenText(r.scheduled_date, r.scheduled_start);
       if (when) kids.push(el("p", { "class": "next-step__text", text: "for " + when }));
       if (r.quote_note) kids.push(el("p", { "class": "next-step__text portal-note", text: r.quote_note }));
-      kids.push(text("You pay after the job is done, through Square."));
+      kids.push(text("You pay after the job is done: tap to pay, cash, Zelle or Cash App."));
       var acc = el("button", { type: "button", "class": "btn btn--primary", text: "Accept quote" });
       acc.addEventListener("click", function () {
         run(acc, function () { return DD.rpc("accept_quote", { p_request: r.id }); }, errBox, "Quote accepted. Thank you!");
@@ -433,14 +433,14 @@
       kids.push(title("Thanks. We're confirming your booking."));
     } else if (st === "scheduled") {
       kids.push(title("You're booked for " + whenText(r.scheduled_date, r.scheduled_start) + "."));
-      kids.push(text("You pay after the job is done, through Square."));
+      kids.push(text("You pay after the job is done: tap to pay, cash, Zelle or Cash App."));
     } else if (st === "on_the_way") {
       kids.push(title("We're on the way."));
     } else if (st === "in_progress") {
       kids.push(title("We're detailing your vehicle now."));
     } else if (st === "done") {
       kids.push(title("All done. Thank you!"));
-      kids.push(text(r.paid ? "Payment received." : "Pay after the job through Square, including tap to pay on our phone."));
+      kids.push(text(r.paid ? "Payment received." : "Pay after the job: tap to pay, cash, Zelle or Cash App."));
     } else if (st === "cancelled") {
       kids.push(title("This request was cancelled."));
       if (r.cancel_reason) kids.push(el("p", { "class": "next-step__text portal-note", text: "Reason: " + r.cancel_reason }));

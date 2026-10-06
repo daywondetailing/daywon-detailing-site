@@ -438,7 +438,7 @@
     function togglePanel(name) {
       ui.panel = ui.panel === name ? null : name;
       paintBar();
-      paintPanel();
+      paintPanel(true);
       if (ui.panel) {
         var f = refs.panel.querySelector("input:not([type=hidden]), textarea");
         var target = refs.panel.firstChild;
@@ -482,13 +482,16 @@
     }
 
     /* ---------- inline panels ---------- */
-    function paintPanel() {
+    /* A background refresh (tab switch, live update) must not wipe a form someone is typing in. */
+    function paintPanel(force) {
+      if (!force && ui.panel && ui.shown === ui.panel && refs.panel.firstChild) return;
+      ui.shown = ui.panel;
       clear(refs.panel);
       if (!ui.panel) return;
       var p = ui.panel === "quote" ? quotePanel() : ui.panel === "suggest" ? suggestPanel() : ui.panel === "cancel" ? cancelPanel() : ui.panel === "paid" ? paidPanel() : null;
       if (p) refs.panel.appendChild(p);
     }
-    function closePanel() { ui.panel = null; paintBar(); paintPanel(); }
+    function closePanel() { ui.panel = null; paintBar(); paintPanel(true); }
 
     function initPicker(root, form, opts, pre) {
       root.appendChild(el("p", { "class": "muted", text: "Loading open times…" }));
@@ -664,7 +667,7 @@
       amount.value = r.quote_amount != null ? String(Number(r.quote_amount)) : "";
       form.appendChild(field("pp-amount", "Amount received ($)", amount));
       var methods = el("fieldset", { "class": "manage-methods" }, [el("legend", { "class": "field__label", text: "Paid by" })]);
-      ["Square", "Cash", "Other"].forEach(function (mth, i) {
+      ["Tap to Pay", "Cash", "Zelle", "Cash App", "Other"].forEach(function (mth, i) {
         var inp = el("input", { type: "radio", name: "method", value: mth });
         if (i === 0) inp.checked = true;
         methods.appendChild(el("label", { "class": "choice" }, [inp, el("span", { "class": "choice__body" }, [el("span", { "class": "choice__title", text: mth })])]));

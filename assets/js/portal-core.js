@@ -56,7 +56,7 @@
     body: "Write a message between 1 and 2,000 characters.",
     amount: "Enter an amount greater than $0 and under $10,000.",
     duration: "Enter a duration between 15 minutes and 12 hours.",
-    method: "Choose how it was paid: Square, Cash or Other.",
+    method: "Choose how it was paid: Tap to Pay, Cash, Zelle, Cash App or Other.",
     range: "Pick a valid date range."
   };
   var ERR = {

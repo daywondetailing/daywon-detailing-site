@@ -132,7 +132,7 @@
     var schedSec = section("scheduling", "Scheduling");
     var lenSec = section("job-length", "Job length per service");
     var offSec = section("time-off", "Time off");
-    var staffSec = section("staff", "Staff");
+    var staffSec = section("staff", "Staff and email alerts");
     var emailSec = section("email", "Email");
     [hoursSec, schedSec, lenSec, offSec, staffSec, emailSec].forEach(function (s) { panel.appendChild(s); });
 
@@ -360,11 +360,27 @@
     })();
 
     /* ----- staff ----- */
+    function testBlock() {
+      var btn = el("button", { type: "button", "class": "btn btn--ghost" }, [DD.icon("i-mail"), "Send myself a test email"]);
+      var out = el("div", { role: "status" });
+      btn.addEventListener("click", function () {
+        inlineErr(out, ""); setBusy(btn, true);
+        db(DD.sb.rpc("send_test_email")).then(function (res) {
+          setBusy(btn, false);
+          var s = String(res || "");
+          clear(out);
+          if (/^sent/.test(s)) out.appendChild(el("p", { "class": "muted", text: "Test email sent to " + DDM.staff.email + ". It should arrive in a minute. Check spam if it doesn't." }));
+          else if (/^skipped/.test(s)) out.appendChild(el("p", { "class": "field__error", text: "Not sent. Staff emails are switched off in the Email settings below." }));
+          else inlineErr(out, "The email failed (" + s + ").");
+        }, function (e) { setBusy(btn, false); inlineErr(out, e.text); });
+      });
+      return el("div", { "class": "mg-form" }, [el("div", { "class": "actions" }, [btn]), out]);
+    }
     (function () {
       var body = el("div");
       staffSec.appendChild(body);
       loadBlock(body, function () {
-        return db(DD.sb.from("staff").select("email,name,active,notify").order("created_at", { ascending: true }).limit(200));
+        return db(DD.sb.from("staff").select("email,name,active,notify,can_sign_in").order("created_at", { ascending: true }).limit(200));
       }, function (items) {
         if (my !== seq) return;
         items = items || [];
@@ -375,10 +391,10 @@
           var ul = el("ul", { "class": "list-rows mg-items" });
           items.forEach(function (p) {
             var err = el("div");
-            var act = check("Active", p.active), nt = check("Email alerts", p.notify);
+            var act = check("Active", p.active), nt = check("Email alerts", p.notify), si = check("Can sign in", p.can_sign_in !== false);
             function update(col, input, label) {
               var val = input.checked, patch = {};
-              if (col === "active" && !val && DDM.staff && DDM.staff.email === p.email) {
+              if ((col === "active" || col === "can_sign_in") && !val && DDM.staff && DDM.staff.email === p.email) {
                 input.checked = true;
                 inlineErr(err, "You can't turn off the account you're signed in with. Sign in as someone else to do that.");
                 return;
@@ -393,19 +409,22 @@
             }
             act.input.addEventListener("change", function () { update("active", act.input); });
             nt.input.addEventListener("change", function () { update("notify", nt.input); });
+            si.input.addEventListener("change", function () { update("can_sign_in", si.input); });
             ul.appendChild(el("li", { "class": "mg-item mg-item--staff" }, [
-              el("div", { "class": "mg-item__main" }, [el("span", { "class": "list-row__title mg-wrap", text: p.name }), el("span", { "class": "list-row__meta mg-wrap", text: p.email })]),
-              el("div", { "class": "mg-item__actions mg-item__actions--checks" }, [act.wrap, nt.wrap]), err
+              el("div", { "class": "mg-item__main" }, [el("span", { "class": "list-row__title mg-wrap", text: p.name }), el("span", { "class": "list-row__meta mg-wrap", text: p.email + (p.can_sign_in === false ? " (alerts only)" : "") })]),
+              el("div", { "class": "mg-item__actions mg-item__actions--checks" }, [act.wrap, nt.wrap, si.wrap]), err
             ]));
           });
           listBox.appendChild(ul);
         }
         var nm = el("input", { id: uid(), type: "text", maxlength: "60", autocomplete: "off" });
         var em = el("input", { id: uid(), type: "email", inputmode: "email", maxlength: "254", autocomplete: "off", autocapitalize: "off" });
+        var signIn = check("Can sign in to this dashboard", true);
         var errBox = el("div");
-        var add = el("button", { type: "submit", "class": "btn btn--primary" }, [DD.icon("i-plus"), "Add staff"]);
+        var add = el("button", { type: "submit", "class": "btn btn--primary" }, [DD.icon("i-plus"), "Add"]);
         var form = el("form", { novalidate: "novalidate", "class": "mg-form" }, [
-          el("div", { "class": "mg-form__grid" }, [field("Name", nm), field("Email", em, "Create this login in Supabase first (Authentication, Users, Add user, Auto Confirm), then add it here.")]),
+          el("div", { "class": "mg-form__grid" }, [field("Name", nm), field("Email", em, "No account to create. They sign in with a code sent to this email.")]),
+          signIn.wrap, el("p", { "class": "field__help", text: "Untick to make this an alerts-only address: it gets the emails but can't open the dashboard." }),
           errBox, el("div", { "class": "actions" }, [add])
         ]);
         form.addEventListener("submit", function (ev) {
@@ -415,15 +434,17 @@
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { bad(em, errBox, "Enter an email like name@example.com."); return; }
           bad(add, errBox, "");
           setBusy(add, true);
-          db(DD.sb.from("staff").insert({ email: e, name: n }).select("email,name,active,notify")).then(function (rows) {
+          db(DD.sb.from("staff").insert({ email: e, name: n, can_sign_in: signIn.input.checked }).select("email,name,active,notify,can_sign_in")).then(function (rows) {
             setBusy(add, false);
             if (!rows || !rows.length) { inlineErr(errBox, "That wasn't saved. " + DD.ERR.NOT_ALLOWED); return; }
             items.push(rows[0]); nm.value = ""; em.value = ""; paintList();
             DD.toast("Saved", "success");
           }, function (er) { setBusy(add, false); inlineErr(errBox, er.text); });
         });
+        body.appendChild(el("p", { "class": "field__help", text: "Everyone with Email alerts ticked gets a message when a request, message, cancellation or time change comes in." }));
         body.appendChild(listBox);
-        body.appendChild(el("h3", { "class": "mg-subtitle", text: "Add staff" }));
+        body.appendChild(testBlock());
+        body.appendChild(el("h3", { "class": "mg-subtitle", text: "Add a person or an alerts-only address" }));
         body.appendChild(form);
         paintList();
       });
