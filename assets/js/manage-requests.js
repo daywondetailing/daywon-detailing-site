@@ -249,7 +249,7 @@
      ===================================================================== */
   var REQ_COLS = "id,ref,customer_id,vehicle_id,address_id,service_id,addon_ids,preferred_date,preferred_start,backup_date,backup_start," +
     "notes,status,quote_amount,quote_note,quoted_at,scheduled_date,scheduled_start,duration_min,buffer_min,assigned,paid,paid_amount," +
-    "paid_method,paid_at,cancelled_by,cancel_reason,source,created_at," +
+    "paid_method,paid_at,cancelled_by,cancel_reason,source,created_at,started_at,finished_at,work_started_at,work_seconds," +
     "customers(id,name,phone,email,contact_method),vehicles(year,make,model,size,color),addresses(street,line2,city,state,zip)";
 
   function pickSlot(root, ymd, time) {
@@ -402,6 +402,15 @@
         r.source === "staff" ? el("span", { text: "Phone booking" }) : null,
         el("span", { text: "Sent " + DD.fmt.ago(r.created_at) })
       ]));
+      if (r.status === "in_progress" || (r.status === "done" && (Number(r.work_seconds) || 0) > 0)) {
+        var running = r.status === "in_progress";
+        refs.timerText = el("span", { "class": "job-timer__time", text: running ? DDM.clockText(DDM.elapsedSec(r)) : DDM.durationText(Number(r.work_seconds) || 0) });
+        refs.head.appendChild(el("div", { "class": "job-timer" + (running ? " is-running" : "") }, [
+          DD.icon("i-clock"),
+          el("span", { "class": "job-timer__label", text: running ? "Job timer" : "Time on the job" }),
+          refs.timerText
+        ]));
+      } else { refs.timerText = null; }
       if (r.status === "cancelled" && (r.cancel_reason || r.cancelled_by)) {
         refs.head.appendChild(el("p", { "class": "muted portal-note", text: "Cancelled by " + (r.cancelled_by || "someone") + (r.cancel_reason ? ": " + r.cancel_reason : "") }));
       }
@@ -943,8 +952,13 @@
     document.addEventListener("visibilitychange", onVisible);
 
     reload(true);
+    var jobTickDetail = setInterval(function () {
+      if (!alive || !D || !refs.timerText || D.r.status !== "in_progress") return;
+      refs.timerText.textContent = DDM.clockText(DDM.elapsedSec(D.r));
+    }, 1000);
     return function () {
       alive = false;
+      clearInterval(jobTickDetail);
       clearTimeout(timer);
       document.removeEventListener("ddm:change", onChange);
       document.removeEventListener("visibilitychange", onVisible);

@@ -24,7 +24,11 @@
       if (h.charAt(0) !== "#") h = "#" + (h.charAt(0) === "/" ? "" : "/") + h;
       if (window.location.hash === h) route(); else window.location.hash = h;
     },
-    refreshCounts: function () { return refreshCounts(); }
+    refreshCounts: function () { return refreshCounts(); },
+    elapsedSec: function (row) { return elapsedSec(row); },
+    clockText: function (s) { return clockText(s); },
+    durationText: function (s) { return durationText(s); },
+    refreshJobs: function () { return refreshJobs(); }
   };
 
   function $(id) { return document.getElementById(id); }
@@ -294,12 +298,85 @@
     });
   }
 
+  /* ---------- job timer: banner on every tab; the database clock keeps phones honest ---------- */
+  var clock = { offset: 0 };
+  var jobs = [];
+  var jobTick = null;
+  function nowMs() { return Date.now() + clock.offset; }
+  function elapsedSec(row) {
+    var base = Number(row && row.work_seconds) || 0;
+    if (row && row.work_started_at) {
+      var t = Date.parse(row.work_started_at);
+      if (isFinite(t)) base += Math.max(0, Math.floor((nowMs() - t) / 1000));
+    }
+    return base;
+  }
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function clockText(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    return Math.floor(sec / 3600) + ":" + pad2(Math.floor((sec % 3600) / 60)) + ":" + pad2(sec % 60);
+  }
+  function durationText(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    if (h) return h + " hr " + m + " min";
+    if (m) return m + " min " + s + " sec";
+    return s + " sec";
+  }
+  function paintJobBar() {
+    var bar = $("job-bar");
+    if (!bar) return;
+    if (!jobs.length) { bar.hidden = true; DD.clear(bar); bar.removeAttribute("data-key"); return; }
+    bar.hidden = false;
+    var key = jobs.map(function (j) { return j.id; }).join(",");
+    if (bar.getAttribute("data-key") !== key) {
+      DD.clear(bar);
+      jobs.forEach(function (j) {
+        var c = j.customers; if (Array.isArray(c)) c = c[0];
+        bar.appendChild(el("a", { "class": "job-bar__item", href: "#/r/" + j.id }, [
+          DD.icon("i-clock"),
+          el("span", { "class": "job-bar__name", text: "Job in progress: " + ((c && c.name) || j.ref) }),
+          el("span", { "class": "job-bar__time", "data-job": j.id, text: clockText(elapsedSec(j)) })
+        ]));
+      });
+      bar.setAttribute("data-key", key);
+    }
+    jobs.forEach(function (j) {
+      var t = bar.querySelector('[data-job="' + j.id + '"]');
+      if (t) t.textContent = clockText(elapsedSec(j));
+    });
+  }
+  function refreshJobs() {
+    if (!DD.ok || !DDM.staff.email) return Promise.resolve();
+    return rows(DD.sb.from("requests").select("id,ref,work_started_at,work_seconds,customers(name)").eq("status", "in_progress").limit(10))
+      .then(function (r) { jobs = r || []; paintJobBar(); }, function () { /* keep what is shown */ });
+  }
+  function startJobTimer() {
+    var bar = $("job-bar");
+    if (!bar) {
+      bar = el("div", { id: "job-bar", "class": "job-bar", hidden: "hidden", role: "status" });
+      var main = $("main");
+      main.parentNode.insertBefore(bar, main);
+    }
+    DD.rpc("server_now").then(function (v) {
+      var t = Date.parse(v);
+      if (isFinite(t)) clock.offset = t - Date.now();
+    }, function () { /* keep the phone clock */ });
+    if (!jobTick) jobTick = setInterval(paintJobBar, 1000);
+    refreshJobs();
+  }
+  function stopJobTimer() {
+    if (jobTick) { clearInterval(jobTick); jobTick = null; }
+    jobs = []; paintJobBar();
+  }
+
   function startApp() {
     state.ready = true;
     buildTabbar();
     showOnly("app");
     paintBadge();
     refreshCounts();
+    startJobTimer();
     subscribe();
     route();
   }
@@ -307,6 +384,7 @@
     if (state.leaving) { try { state.leaving(); } catch (e) { /* ignore */ } state.leaving = null; }
     if (state.unlisten) { try { state.unlisten(); } catch (e) { /* ignore */ } state.unlisten = null; }
     clearTimeout(state.rerender);
+    stopJobTimer();
     state.current = "";
     DDM.staff.email = ""; DDM.staff.name = "";
     state.counts = 0;
@@ -331,6 +409,7 @@
         personName(n.request_id).then(function (name) { DD.toast("New message from " + name, "info"); });
       }
       refreshCounts();
+      if (table === "requests") refreshJobs();
       var ev = new CustomEvent("ddm:change", { cancelable: true, detail: { table: table, eventType: payload && payload.eventType, row: n || null } });
       var handled = !document.dispatchEvent(ev);
       if (!handled && /^\/(calendar|customers)/.test(state.current)) {

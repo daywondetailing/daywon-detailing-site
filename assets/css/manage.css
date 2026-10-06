@@ -86,3 +86,16 @@
 @media (prefers-reduced-motion: reduce) {
   .mini-status, .mg-item { transition: none; }
 }
+
+/* ---------- job timer ---------- */
+.job-bar { position: sticky; top: var(--header-h); z-index: 54; display: grid; gap: 1px; background: #14532d; border-bottom: 1px solid #166534; }
+.job-bar[hidden] { display: none; }
+.job-bar__item { display: flex; align-items: center; gap: var(--s-3); min-height: 44px; padding: 6px var(--gutter); color: #fff; text-decoration: none; font-weight: 600; }
+.job-bar__item:hover { color: #fff; background: #166534; text-decoration: none; }
+.job-bar__name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job-bar__time { font-variant-numeric: tabular-nums; font-size: 1.25rem; letter-spacing: .5px; }
+.job-timer { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-3) 0; padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--ink-800); color: var(--ink-100); }
+.job-timer.is-running { background: #14532d; color: #fff; }
+.job-timer__label { font-weight: 600; }
+.job-timer__time { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 1.6rem; font-weight: 700; letter-spacing: .5px; }
+
