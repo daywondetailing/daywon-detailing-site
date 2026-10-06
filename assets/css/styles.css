@@ -648,3 +648,31 @@ html.js-motion .hero__title.is-sheen::after {
 /* header: keep links on one line when the extra My request link is present */
 .site-nav a { white-space: nowrap; }
 @media (max-width: 1180px) { .site-nav a { padding: 0 var(--s-2); } .site-header__cta { white-space: nowrap; } }
+
+/* ---- Carousel (photos and videos on the home page) ---- */
+.carousel { position: relative; margin-top: var(--s-6); }
+.carousel__track { display: flex; gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding-bottom: var(--s-3); scrollbar-width: thin; }
+.carousel__track:focus-visible { outline: 2px solid var(--blue-500); outline-offset: 4px; border-radius: var(--r-md); }
+.carousel__slide { flex: 0 0 min(78%, 300px); margin: 0; scroll-snap-align: start; }
+.carousel__media { aspect-ratio: 9 / 16; border-radius: var(--r-md); overflow: hidden; background: var(--ink-900); border: 1px solid var(--ink-700); box-shadow: var(--edge); }
+.carousel__media video, .carousel__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.carousel__media--photo { aspect-ratio: 3 / 4; }
+.carousel__slide figcaption { margin-top: var(--s-3); color: var(--ink-300); font-size: var(--fs-sm); }
+.carousel__slide figcaption strong { color: var(--ink-100); font-weight: 600; }
+.carousel__btn, .carousel__dots { display: none; }
+.carousel.is-enhanced .carousel__btn { display: grid; place-items: center; position: absolute; top: calc(50% - 40px); width: 44px; height: 44px; border-radius: var(--r-pill); border: 1px solid var(--ink-700); background: rgb(11 15 22 / .85); color: var(--white); cursor: pointer; }
+.carousel__btn:hover:not(:disabled) { background: var(--blue-600); border-color: var(--blue-600); }
+.carousel__btn:disabled { opacity: .35; cursor: default; }
+.carousel__btn:focus-visible, .carousel__dot:focus-visible { outline: 2px solid var(--blue-300); outline-offset: 2px; }
+.carousel__btn--prev { left: -6px; }
+.carousel__btn--next { right: -6px; }
+.carousel.is-enhanced .carousel__dots { display: flex; justify-content: center; gap: var(--s-2); margin-top: var(--s-2); }
+.carousel__dot { width: 10px; height: 10px; padding: 0; border-radius: var(--r-pill); border: 0; background: var(--ink-700); cursor: pointer; position: relative; }
+.carousel__dot::after { content: ""; position: absolute; inset: -8px; }
+.carousel__dot[aria-current="true"] { background: var(--blue-500); }
+.work__sub { margin-top: var(--s-8); }
+@media (min-width: 960px) { .carousel__slide { flex-basis: 320px; } .carousel__btn--prev { left: -22px; } .carousel__btn--next { right: -22px; } }
+@media (prefers-reduced-motion: reduce) { .carousel__track { scroll-behavior: auto; } }
+/* About: single column now that the team photo is gone */
+.about { grid-template-columns: 1fr; }
+.about__copy { max-width: 70ch; }

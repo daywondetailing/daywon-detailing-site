@@ -257,6 +257,46 @@
       }));
       panel.appendChild(historySection(s.jobs));
       panel.appendChild(notesSection(s));
+      panel.appendChild(deleteSection(s));
+    }
+
+    /* delete (handy for clearing out test customers). Their requests, vehicles, addresses and notes go with them. */
+    function deleteSection(s) {
+      var sec = el("section", { "class": "mg-sec" });
+      sec.appendChild(el("h2", { "class": "portal-sec__title", text: "Delete customer" }));
+      var box = el("div");
+      sec.appendChild(box);
+      function paint(confirming) {
+        clear(box);
+        var n = s.jobs.length;
+        var reqs = n === 1 ? "1 request" : n + " requests";
+        if (!confirming) {
+          var del = el("button", { type: "button", "class": "btn btn--ghost btn--danger" }, [DD.icon("i-trash"), "Delete this customer"]);
+          del.addEventListener("click", function () { paint(true); });
+          box.appendChild(el("p", { "class": "field__help", text: "Removes this customer for good, along with their " + reqs + ", vehicles, addresses and notes." }));
+          box.appendChild(el("div", { "class": "actions" }, [del]));
+          return;
+        }
+        var err = el("div");
+        var yes = el("button", { type: "button", "class": "btn btn--danger" }, "Yes, delete for good");
+        var no = el("button", { type: "button", "class": "btn btn--ghost" }, "Keep them");
+        no.addEventListener("click", function () { paint(false); });
+        yes.addEventListener("click", function () {
+          inlineErr(err, ""); setBusy(yes, true); no.disabled = true;
+          db(DD.sb.from("customers").delete().eq("id", id).select("id")).then(function (rows) {
+            if (!rows || !rows.length) { setBusy(yes, false); no.disabled = false; inlineErr(err, "That wasn't deleted. " + DD.ERR.NOT_ALLOWED); return; }
+            DD.toast("Customer deleted", "success");
+            DDM.refreshCounts();
+            DDM.go("#/customers");
+          }, function (e) { setBusy(yes, false); no.disabled = false; inlineErr(err, e.text); });
+        });
+        box.appendChild(el("div", { "class": "inline-confirm" }, [
+          el("p", { text: "Delete " + s.c.name + " and their " + reqs + "? This can't be undone." }),
+          err, el("div", { "class": "actions" }, [yes, no])
+        ]));
+      }
+      paint(false);
+      return sec;
     }
 
     /* contact */
