@@ -674,6 +674,10 @@ html.js-motion .hero__title.is-sheen::after {
 @media (min-width: 960px) { .carousel__slide { flex-basis: 320px; } .carousel__btn--prev { left: -22px; } .carousel__btn--next { right: -22px; } }
 @media (prefers-reduced-motion: reduce) { .carousel__track { scroll-behavior: auto; } }
 
-/* About: photo beside the copy, centered and tidy */
-.about__photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 40%; border-radius: var(--r-md); border: 1px solid var(--ink-700); box-shadow: var(--edge); }
-@media (max-width: 959px) { .about__photo { max-width: 420px; margin-inline: auto; } .about__photo img { aspect-ratio: 4 / 3; } }
+/* About: centered message with the four promises in a grid */
+.about { display: block; max-width: 56rem; margin-inline: auto; text-align: center; }
+.about__lead { font-size: var(--fs-xl); line-height: 1.35; font-weight: 600; color: var(--white); max-width: 36ch; margin: var(--s-4) auto 0; }
+.about__body { color: var(--ink-300); max-width: 58ch; margin: var(--s-4) auto 0; }
+.about .about__list { margin-top: var(--s-7); border-top: 0; gap: var(--s-4); text-align: left; }
+.about .about__list li { border: 1px solid var(--ink-700); border-radius: var(--r-md); padding: var(--s-5); background: var(--ink-900); }
+@media (min-width: 700px) { .about .about__list { grid-template-columns: 1fr 1fr; } }
