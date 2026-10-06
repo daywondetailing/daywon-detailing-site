@@ -651,7 +651,7 @@ html.js-motion .hero__title.is-sheen::after {
 
 /* ---- Carousel (photos and videos on the home page) ---- */
 .carousel { position: relative; margin-top: var(--s-6); }
-.carousel__track { display: flex; gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding-bottom: var(--s-3); scrollbar-width: thin; }
+.carousel__track { display: flex; align-items: flex-start; gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding-bottom: var(--s-3); scrollbar-width: thin; }
 .carousel__track:focus-visible { outline: 2px solid var(--blue-500); outline-offset: 4px; border-radius: var(--r-md); }
 .carousel__slide { flex: 0 0 min(78%, 300px); margin: 0; scroll-snap-align: start; }
 .carousel__media { aspect-ratio: 9 / 16; border-radius: var(--r-md); overflow: hidden; background: var(--ink-900); border: 1px solid var(--ink-700); box-shadow: var(--edge); }
@@ -673,6 +673,7 @@ html.js-motion .hero__title.is-sheen::after {
 .work__sub { margin-top: var(--s-8); }
 @media (min-width: 960px) { .carousel__slide { flex-basis: 320px; } .carousel__btn--prev { left: -22px; } .carousel__btn--next { right: -22px; } }
 @media (prefers-reduced-motion: reduce) { .carousel__track { scroll-behavior: auto; } }
-/* About: single column now that the team photo is gone */
-.about { grid-template-columns: 1fr; }
-.about__copy { max-width: 70ch; }
+
+/* About: photo beside the copy, centered and tidy */
+.about__photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 40%; border-radius: var(--r-md); border: 1px solid var(--ink-700); box-shadow: var(--edge); }
+@media (max-width: 959px) { .about__photo { max-width: 420px; margin-inline: auto; } .about__photo img { aspect-ratio: 4 / 3; } }

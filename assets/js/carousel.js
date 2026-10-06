@@ -30,7 +30,8 @@
     function goTo(i) {
       i = Math.max(0, Math.min(slides.length - 1, i));
       var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      track.scrollTo({ left: slides[i].offsetLeft - slides[0].offsetLeft, behavior: reduce ? "auto" : "smooth" });
+      track.scrollTo({ left: slides[i].offsetLeft - slides[0].offsetLeft, behavior: (reduce || document.hidden) ? "instant" : "smooth" });
+      setTimeout(paint, reduce || document.hidden ? 30 : 450);
     }
     function paint() {
       var i = current(), atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
