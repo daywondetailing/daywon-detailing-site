@@ -185,7 +185,7 @@
     { n: "vehicle_make", ok: function () { return !manualVehicle() || val("vehicle_make").length >= 2; }, msg: "Enter the make, like Toyota or Ford." },
     { n: "vehicle_model", ok: function () { return !manualVehicle() || val("vehicle_model").length >= 1; }, msg: "Enter the model." },
     { n: "vehicle_size", ok: function () { return !!radioVal("vehicle_size"); }, msg: "Choose your vehicle's size. It's how we price the job." },
-    { n: "vehicle_color", ok: function () { return val("vehicle_color").length >= 2; }, msg: "Enter the vehicle's color." },
+    { n: "vehicle_color", ok: function () { return val("vehicle_color").length >= 2; }, msg: "Tap your vehicle's color, or choose Other and type it." },
     { n: "service", ok: function () { return !!serviceById(radioVal("service")); }, msg: "Choose a package." },
     { n: "address_street", ok: function () { return val("address_street").length >= 5; }, msg: "Enter the street address where we'll do the detail." },
     { n: "address_city", ok: function () { return val("address_city").length >= 2; }, msg: "Enter the city." },
@@ -287,6 +287,25 @@
       refreshSched();
     }
   });
+
+  /* ---------- color buttons fill vehicle_color; "Other" shows a text box ---------- */
+  var colorText = form.elements.vehicle_color;
+  function syncColor(focus) {
+    var pick = radioVal("color_pick");
+    var other = pick === "Other";
+    colorText.hidden = !other;
+    if (!other) colorText.value = pick;
+    else {
+      if (["Black", "White", "Silver", "Gray", "Blue", "Red", "Green", "Brown or beige", "Gold or yellow", "Orange"].indexOf(colorText.value) >= 0) colorText.value = "";
+      if (focus) colorText.focus();
+    }
+  }
+  form.addEventListener("change", function (e) { if (e.target && e.target.name === "color_pick") { syncColor(true); validateField("vehicle_color"); } });
+  function setColor(c) {
+    var known = form.querySelector('input[name="color_pick"][value="' + String(c || "").replace(/"/g, "") + '"]');
+    if (known) { known.checked = true; syncColor(false); }
+    else if (c) { setRadio("color_pick", "Other"); colorText.hidden = false; colorText.value = c; }
+  }
 
   /* ---------- job length for the date picker (taken windows) ---------- */
   function jobMinutes() {
@@ -662,7 +681,7 @@
     if (window.DDVehicle) window.DDVehicle.set({ year: d.vehicle_year, make: d.vehicle_make, model: d.vehicle_model, size: d.vehicle_size });
     else { setVal("vehicle_year", d.vehicle_year); setVal("vehicle_make", d.vehicle_make); setVal("vehicle_model", d.vehicle_model); }
     setRadio("vehicle_size", d.vehicle_size);
-    setVal("vehicle_color", d.vehicle_color);
+    setColor(d.vehicle_color);
     renderServices(d.service_id);
     renderAddOns();
     (d.addon_ids || []).forEach(function (a) { var c = addonBox.querySelector('input[name="addons"][value="' + a + '"]'); if (c) c.checked = true; });

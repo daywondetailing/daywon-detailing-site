@@ -799,3 +799,30 @@ html.js-motion .hero__title.is-sheen::after {
 .compare__table .compare__label, .compare__table .compare__corner, .compare__table tfoot th, .compare__table .compare__group th { text-align: left; }
 @media (max-width: 599px) { .compare__table { min-width: 640px; font-size: var(--fs-xs); } .compare__table .compare__label { min-width: 128px; max-width: 140px; padding-inline: 10px; } .compare__pkg { min-width: 104px; } .compare__table th, .compare__table td { padding: 12px 8px; } .compare__price-value { font-size: 1.375rem; } .compare__name { font-size: var(--fs-sm); } }
 [data-contact="phone"] { white-space: nowrap; }
+
+/* ---------- Round 5 (2026-10-06) ---------- */
+/* Fields after a hidden first field must still clear the floated legend (manual vehicle entry jumped beside it). */
+.form-group > :not(legend) { clear: both; }
+/* Hero package list: plain readable price, not the condensed caps label. */
+.quote-starter__duration { font-family: var(--font-body); font-stretch: 100%; font-weight: 600; font-size: var(--fs-sm); letter-spacing: 0; text-transform: none; color: var(--blue-300); white-space: nowrap; }
+/* Compare chart: bigger, clearer marks. */
+.compare__yes { width: 32px; height: 32px; padding: 6px; border-radius: 50%; background: rgb(94 224 160 / .16); color: var(--success); stroke-width: 3; box-sizing: border-box; }
+.compare__table .is-featured .compare__yes { background: rgb(94 224 160 / .24); }
+.compare__no { display: inline-block; width: 14px; height: 2px; vertical-align: middle; background: var(--ink-700); font-size: 0; }
+.compare__note { margin-top: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-100); }
+.compare__table tbody tr:nth-child(even) td, .compare__table tbody tr:nth-child(even) .compare__label { background-color: rgb(255 255 255 / .015); }
+.compare__table tbody td { padding-block: 16px; }
+@media (max-width: 599px) { .compare__yes { width: 28px; height: 28px; padding: 5px; } }
+/* Color buttons */
+.color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: var(--s-2); }
+.color-choice { position: relative; display: flex; align-items: center; gap: var(--s-3); min-height: 48px; padding: 10px 12px; border: 1px solid var(--ink-700); border-radius: var(--r-sm); background: var(--ink-800); cursor: pointer; font-weight: 600; color: var(--ink-100); font-size: var(--fs-sm); transition: border-color var(--t-fast); }
+.color-choice:hover { border-color: var(--ink-400); }
+.color-choice input { position: absolute; opacity: 0; pointer-events: none; }
+.color-choice:has(input:checked) { border-color: var(--blue-500); outline: 1px solid var(--blue-500); outline-offset: -2px; background: var(--ink-900); }
+.color-choice:has(input:focus-visible) { outline: 2px solid var(--blue-300); outline-offset: 2px; }
+.color-choice__dot { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25); }
+.color-choice__dot--other { background: conic-gradient(#e0661b, #d9a91a, #2f6b3a, #1f4fbf, #7b3fbf, #b3171d, #e0661b); }
+.field[data-field="vehicle_color"] #f-color { margin-top: var(--s-2); }
+.compare__yes { padding: 4px; background: rgb(94 224 160 / .22); }
+.compare__yes path, .compare__yes * { stroke-width: 3.25; }
+.compare__table .is-featured .compare__yes { background: rgb(94 224 160 / .3); }

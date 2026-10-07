@@ -101,15 +101,23 @@
               </div>
               <button type="button" class="vsearch__manual" id="vsearch-back">Search the vehicle list instead</button>
             </div>
-            <div class="form-row">
-              <div class="field" data-field="vehicle_year">
-                <label class="field__label" for="f-year">Year <span class="field__optional">(optional)</span></label>
-                <input type="text" id="f-year" name="vehicle_year" inputmode="numeric" maxlength="4" placeholder="e.g. 2019">
+            <input type="hidden" id="f-year" name="vehicle_year">
+            <div class="field" data-field="vehicle_color" role="radiogroup" aria-labelledby="l-color">
+              <span class="field__label" id="l-color">Color</span>
+              <div class="color-grid">
+                <label class="color-choice"><input type="radio" name="color_pick" value="Black"><span class="color-choice__dot" style="--c:#111"></span><span>Black</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="White"><span class="color-choice__dot" style="--c:#f5f5f5"></span><span>White</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Silver"><span class="color-choice__dot" style="--c:linear-gradient(135deg,#e3e6ea,#9aa1aa)"></span><span>Silver</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Gray"><span class="color-choice__dot" style="--c:#5f646b"></span><span>Gray</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Blue"><span class="color-choice__dot" style="--c:#1f4fbf"></span><span>Blue</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Red"><span class="color-choice__dot" style="--c:#b3171d"></span><span>Red</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Green"><span class="color-choice__dot" style="--c:#2f6b3a"></span><span>Green</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Brown or beige"><span class="color-choice__dot" style="--c:linear-gradient(135deg,#d8c3a0,#6b4a2f)"></span><span>Brown / beige</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Gold or yellow"><span class="color-choice__dot" style="--c:#d9a91a"></span><span>Gold / yellow</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Orange"><span class="color-choice__dot" style="--c:#e0661b"></span><span>Orange</span></label>
+                <label class="color-choice"><input type="radio" name="color_pick" value="Other"><span class="color-choice__dot color-choice__dot--other"></span><span>Other</span></label>
               </div>
-              <div class="field" data-field="vehicle_color">
-                <label class="field__label" for="f-color">Color</label>
-                <input type="text" id="f-color" name="vehicle_color" placeholder="e.g. Black">
-              </div>
+              <input type="text" id="f-color" name="vehicle_color" maxlength="40" placeholder="Type the color" aria-label="Vehicle color" hidden>
             </div>
             <div class="field" data-field="vehicle_size" role="radiogroup" aria-labelledby="l-size">
               <span class="field__label" id="l-size">Size</span>

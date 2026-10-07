@@ -1,6 +1,46 @@
-/* Services shown on the site. Edit here; the pages update automatically. */
+/* Services shown on the site, cheapest first (owner rule: always list them by price). Edit here; the pages update automatically. */
 window.SITE_DATA = {
   services: [
+    {
+      id: "exterior-only",
+      startingAt: 25, // starting price; the final quote depends on vehicle size and condition
+      name: "Exterior Only Detail",
+      duration: "30 min",
+      summary: "A complete exterior wash for daily-driven vehicles, without the interior work.",
+      interior: [],
+      exterior: [
+        "Pre-wash to safely loosen dirt and road grime",
+        "Contact hand wash",
+        "Tires, rims, and wheel faces cleaned and scrubbed"
+      ],
+      bestFor: [],
+      note: "",
+      importantNote: "",
+      addOnIds: ["spray-wax", "tire-shine"],
+      bookingUrls: {}
+    },
+    {
+      id: "interior-only",
+      startingAt: 50, // starting price; the final quote depends on vehicle size and condition
+      name: "Interior Only Detail",
+      duration: "30 min",
+      summary: "A thorough interior clean for daily-driven vehicles, without the exterior wash.",
+      interior: [
+        "Thorough vacuum of carpets, mats, seats, trunk/cargo area, and accessible areas",
+        "Tornador blowout of carpets, seat seams, vents, cracks, crevices, and accessible hard-to-reach areas",
+        "Interior wipe-down of accessible dashboard, center console, door panels, cup holders, trim, and other reachable surfaces",
+        "Steam cleaning of applicable interior surfaces",
+        "Carpet and seat spot treatment for light stains and affected areas",
+        "Interior windows and screens cleaned",
+        "Detailed cleaning around accessible seat rails, door pockets, and crevices"
+      ],
+      exterior: [],
+      bestFor: [],
+      note: "",
+      importantNote: "",
+      addOnIds: ["carpet-extraction", "seat-extraction", "carpet-seat-extraction"],
+      bookingUrls: {}
+    },
     {
       id: "express-refresh",
       startingAt: 75, // starting price; the final quote depends on vehicle size and condition
@@ -94,46 +134,6 @@ window.SITE_DATA = {
       importantNote: "Extraction can leave carpets and cloth seats slightly damp after the appointment. Drying time depends on temperature, humidity, vehicle ventilation, and the amount of extraction needed.",
       addOnIds: [],
       bookingUrls: { square: "https://book.squareup.com/appointments/oxnwtlyrbt4e47/location/LN3M0ZGQN4ND0/services/TSTQXNCIOXL6IAHGNDIU42ZL" }
-    },
-    {
-      id: "interior-only",
-      startingAt: 50, // starting price; the final quote depends on vehicle size and condition
-      name: "Interior Only Detail",
-      duration: null,
-      summary: "A thorough interior clean for daily-driven vehicles, without the exterior wash.",
-      interior: [
-        "Thorough vacuum of carpets, mats, seats, trunk/cargo area, and accessible areas",
-        "Tornador blowout of carpets, seat seams, vents, cracks, crevices, and accessible hard-to-reach areas",
-        "Interior wipe-down of accessible dashboard, center console, door panels, cup holders, trim, and other reachable surfaces",
-        "Steam cleaning of applicable interior surfaces",
-        "Carpet and seat spot treatment for light stains and affected areas",
-        "Interior windows and screens cleaned",
-        "Detailed cleaning around accessible seat rails, door pockets, and crevices"
-      ],
-      exterior: [],
-      bestFor: [],
-      note: "",
-      importantNote: "",
-      addOnIds: ["carpet-extraction", "seat-extraction", "carpet-seat-extraction"],
-      bookingUrls: {}
-    },
-    {
-      id: "exterior-only",
-      startingAt: 25, // starting price; the final quote depends on vehicle size and condition
-      name: "Exterior Only Detail",
-      duration: null,
-      summary: "A complete exterior wash for daily-driven vehicles, without the interior work.",
-      interior: [],
-      exterior: [
-        "Pre-wash to safely loosen dirt and road grime",
-        "Contact hand wash",
-        "Tires, rims, and wheel faces cleaned and scrubbed"
-      ],
-      bestFor: [],
-      note: "",
-      importantNote: "",
-      addOnIds: ["spray-wax", "tire-shine"],
-      bookingUrls: {}
     }
   ],
   /* Compare chart on the home page. Per package: true = included, "addon" = available as an add-on,

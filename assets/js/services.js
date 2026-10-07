@@ -101,7 +101,7 @@
       if (i === 0) input.checked = true;
       input.addEventListener('change', function () { if (input.checked) sync(s.id); });
       var name = el('span', 'quote-starter__name', s.name);
-      var dur = el('span', 'quote-starter__duration', priceText(s, true));
+      var dur = el('span', 'quote-starter__duration', priceText(s));
       if (!s.startingAt) dur.appendChild(renderDuration(s));
       label.appendChild(input);
       label.appendChild(name);

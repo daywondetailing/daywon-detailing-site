@@ -140,8 +140,6 @@
     var sized = v.size < 4 && setSize(SIZES[v.size]);
     if (sizeHelp) sizeHelp.textContent = sized ? "We picked the size from your vehicle. Change it if it's not right." : "Choose the size that fits best.";
     showPicked();
-    var y = yearEl;
-    if (!year && y) y.focus();
   }
 
   function change() {
