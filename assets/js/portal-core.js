@@ -8,7 +8,7 @@
   var CONTACT = CONFIG.contact || {};
   var SCHED = CONFIG.schedule || {};
   var DATA = window.SITE_DATA || { services: [], addOns: [] };
-  var PHONE = CONTACT.phoneDisplay || "240-579-5092";
+  var PHONE = CONTACT.phoneDisplay || "240-813-0689";
   var TIMEOUT = PORTAL.timeoutMs || 10000;
   var SVGNS = "http://www.w3.org/2000/svg";
 
@@ -47,9 +47,9 @@
     address_city: "Enter the city.",
     address_state: "Choose a state.",
     address_zip: "Enter a 5-digit ZIP code.",
-    in_area: "We only serve addresses within 15 miles of Silver Spring. Check the box to confirm, or call us to ask.",
+    in_area: "Tell us if the address is within 15 miles of Silver Spring. Farther is fine, with a $50 travel fee.",
     preferred_date: "Choose a preferred date and an arrival window we're open.",
-    backup_date: "Choose a backup date and arrival window that is different from your first choice.",
+    backup_date: "Choose an arrival window for your backup date (different from your first choice), or clear it.",
     notes: "Keep notes under 1,000 characters.",
     note: "Keep the note under 500 characters.",
     reason: "Keep the reason under 500 characters.",
@@ -308,11 +308,14 @@
 
   /* ---------- availability (cached 60 s) ---------- */
   var availCache = {};
-  DD.availability = function (from, to) {
-    var key = from + "|" + to;
+  /* exclude: a request id whose own held time should show as free (used when editing it). */
+  DD.availability = function (from, to, exclude) {
+    var key = from + "|" + to + "|" + (exclude || "");
     var hit = availCache[key];
     if (hit && Date.now() - hit.at < 60000) return hit.p;
-    var p = DD.rpc("get_availability", { p_from: from, p_to: to });
+    var args = { p_from: from, p_to: to };
+    if (exclude) args.p_exclude = exclude;
+    var p = DD.rpc("get_availability", args);
     availCache[key] = { at: Date.now(), p: p };
     p.catch(function () { if (availCache[key] && availCache[key].p === p) delete availCache[key]; });
     return p;

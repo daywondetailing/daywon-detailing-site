@@ -8,9 +8,9 @@
   var formCfg = config.form || {};
   var DATA = window.SITE_DATA || { services: [], addOns: [] };
   var SVC = window.SITE_SERVICES || null;
-  var PHONE = contact.phoneDisplay || "240-579-5092";
+  var PHONE = contact.phoneDisplay || "240-813-0689";
   var EMAIL = contact.email || "daywondetailing@gmail.com";
-  var PHONE_E164 = contact.phoneE164 || "+12405795092";
+  var PHONE_E164 = contact.phoneE164 || "+12408130689";
 
   var wrap = document.getElementById("quote-form-wrap");
   var form = document.getElementById("quote-form");
@@ -97,6 +97,11 @@
       var input = el("input", { type: "radio", name: "service", value: s.id });
       if (s.id === preselect) input.checked = true;
       var meta = el("span", { "class": "choice__meta" });
+      var full = fullService(s.id) || s;
+      if (full.startingAt) {
+        meta.appendChild(el("span", { "class": "choice__price", text: "Starting at $" + full.startingAt }));
+        meta.appendChild(document.createTextNode(" · "));
+      }
       meta.appendChild(durationNode(s));
       var body = el("span", { "class": "choice__body" }, [
         el("span", { "class": "choice__title", text: s.name }),
@@ -176,8 +181,9 @@
         if (!/^\d{4}$/.test(v)) return false;
         return +v >= 1950 && +v <= new Date().getFullYear() + 1;
       }, msg: "Enter a 4-digit year, or leave it blank." },
-    { n: "vehicle_make", ok: function () { return val("vehicle_make").length >= 2; }, msg: "Enter the make, like Toyota or Ford." },
-    { n: "vehicle_model", ok: function () { return val("vehicle_model").length >= 1; }, msg: "Enter the model." },
+    { n: "vehicle_search", ok: function () { return manualVehicle() || (val("vehicle_make").length >= 2 && val("vehicle_model").length >= 1); }, msg: "Pick your vehicle from the list, or tap \"Type it in yourself\"." },
+    { n: "vehicle_make", ok: function () { return !manualVehicle() || val("vehicle_make").length >= 2; }, msg: "Enter the make, like Toyota or Ford." },
+    { n: "vehicle_model", ok: function () { return !manualVehicle() || val("vehicle_model").length >= 1; }, msg: "Enter the model." },
     { n: "vehicle_size", ok: function () { return !!radioVal("vehicle_size"); }, msg: "Choose your vehicle's size. It's how we price the job." },
     { n: "vehicle_color", ok: function () { return val("vehicle_color").length >= 2; }, msg: "Enter the vehicle's color." },
     { n: "service", ok: function () { return !!serviceById(radioVal("service")); }, msg: "Choose a package." },
@@ -185,14 +191,16 @@
     { n: "address_city", ok: function () { return val("address_city").length >= 2; }, msg: "Enter the city." },
     { n: "address_state", ok: function () { return ["MD", "DC", "VA"].indexOf(val("address_state")) !== -1; }, msg: "Choose a state." },
     { n: "address_zip", ok: function () { return /^\d{5}$/.test(val("address_zip")); }, msg: "Enter a 5-digit ZIP code." },
-    { n: "in_area", ok: function () { return form.elements.in_area.checked; }, msg: "We only serve addresses within 15 miles of Silver Spring. Check the box to confirm, or call us to ask." },
+    { n: "in_area", ok: function () { return !!radioVal("area"); }, msg: "Tell us if the address is within 15 miles of Silver Spring. Farther is fine, with a $50 travel fee." },
     { n: "preferred_date", ok: function () { return dateOk(val("preferred_date")) && val("preferred_time") !== ""; }, msg: "Choose a preferred date and an arrival window." },
     { n: "backup_date", ok: function () {
+        if (!val("backup_date") && !val("backup_time")) return true;   // optional
         if (!dateOk(val("backup_date")) || val("backup_time") === "") return false;
         return !(val("backup_date") === val("preferred_date") && val("backup_time") === val("preferred_time"));
-      }, msg: "Choose a backup date and arrival window that is different from your first choice." },
+      }, msg: "Choose an arrival window for your backup date (different from your first choice), or clear it." },
     { n: "notes", ok: function () { return form.elements.notes.value.length <= 1000; }, msg: "Keep notes under 1,000 characters." }
   ];
+  function manualVehicle() { return !!(window.DDVehicle && window.DDVehicle.manual()); }
   var RULE = {};
   RULES.forEach(function (r) { RULE[r.n] = r; });
 
@@ -347,10 +355,11 @@
       ["Service", s ? s.name : ""],
       ["Add-ons", add.length ? add.join(", ") : "None"],
       ["Address", addressText()],
+      ["Service area", radioVal("area") === "outside" ? "Outside 15 miles ($50 travel fee)" : "Within 15 miles"],
       ["Preferred date", formatDate(val("preferred_date"))],
       ["Preferred time", val("preferred_time")],
-      ["Backup date", formatDate(val("backup_date"))],
-      ["Backup time", val("backup_time")],
+      ["Backup date", val("backup_date") ? formatDate(val("backup_date")) : "None"],
+      ["Backup time", val("backup_time") || "None"],
       ["Notes", val("notes") || "None"]
     ];
   }
@@ -396,7 +405,7 @@
     var panel = el("div", { "class": "panel success-panel" }, [
       icon("i-check", "icon--xl"),
       h,
-      el("p", { text: "Thanks, " + first + ". We'll reply within 1 to 2 hours with your quote by " + way + " and confirm your time. You pay after the job is done." }),
+      el("p", { text: "Thanks, " + first + ". We'll reply during our office hours with your quote by " + way + " and confirm your time. You pay after the job is done." }),
       dl,
       el("a", { "class": "btn btn--ghost", href: "index.html", text: "Back to home" })
     ]);
@@ -458,6 +467,7 @@
 
     if (form.elements.botcheck && form.elements.botcheck.checked) { showSuccess(); return; }
 
+    if (editId) { editSubmit(); return; }
     if (window.DD && window.DD.ok) portalSubmit();
     else webSubmit();
   });
@@ -502,7 +512,8 @@
       address_city: val("address_city"),
       address_state: val("address_state"),
       address_zip: val("address_zip"),
-      in_area: true,
+      area: radioVal("area"),
+      in_area: radioVal("area") === "inside" ? true : "outside",
       preferred_date: val("preferred_date"),
       preferred_start: val("preferred_start"),
       backup_date: val("backup_date"),
@@ -517,6 +528,9 @@
   function portalDone(res) {
     var id = res && res.id ? String(res.id) : "";
     if (!/^[0-9a-fA-F-]{32,40}$/.test(id)) { setLoading(false); showSuccess(); return; }
+    if (res.edit_token) {
+      try { window.localStorage.setItem("dd_edit_" + id, String(res.edit_token)); } catch (e) { /* storage blocked: edit after signing in */ }
+    }
     var email = val("email").toLowerCase();
     var wantsStaff = qs.get("staff") === "1";
     var staffCheck = wantsStaff ? window.DD.auth.isStaff() : Promise.resolve(false);
@@ -550,6 +564,7 @@
         return;
       }
       setLoading(false);
+      if (code === "SLOT_TAKEN") { slotTaken(text); return; }
       if (code === "INVALID") {
         var map = { addons: "service", service: "service", range: "preferred_date" };
         var field = map[err.field] || err.field;
@@ -562,6 +577,161 @@
       showSendError(text);
     });
   }
+
+  function slotTaken(text) {
+    if (window.DD && window.DD.availability && window.DD.availability.clear) window.DD.availability.clear();
+    if (window.DDSched && window.DDSched.setExclude) window.DDSched.setExclude(editId);
+    setError("preferred_date", text || "That time was just taken. Pick another time.");
+    renderSummary(["preferred_date"]);
+  }
+
+  /* ---------- service area: check the address once it's typed ---------- */
+  var AREA = (config.serviceArea || {});
+  var areaPicked = false, lastAreaKey = "";
+  form.addEventListener("change", function (e) { if (e.target && e.target.name === "area" && e.isTrusted) areaPicked = true; });
+  function milesFrom(lat, lng) {
+    var R = 3958.8, k = Math.PI / 180, la = AREA.lat || 38.9907, lo = AREA.lng || -77.0261;
+    var a = Math.sin((lat - la) * k / 2), b = Math.sin((lng - lo) * k / 2);
+    return 2 * R * Math.asin(Math.sqrt(a * a + Math.cos(la * k) * Math.cos(lat * k) * b * b));
+  }
+  function checkArea() {
+    if (areaPicked || !window.fetch) return;
+    var street = val("address_street"), city = val("address_city"), zip = val("address_zip");
+    if (street.length < 5 || !/^\d{5}$/.test(zip)) return;
+    var key = [street, city, val("address_state"), zip].join("|").toLowerCase();
+    if (key === lastAreaKey) return;
+    lastAreaKey = key;
+    var url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us" +
+      "&street=" + encodeURIComponent(street) + "&city=" + encodeURIComponent(city) +
+      "&state=" + encodeURIComponent(val("address_state")) + "&postalcode=" + encodeURIComponent(zip);
+    fetch(url, { headers: { Accept: "application/json" } }).then(function (r) { return r.json(); }).then(function (list) {
+      if (areaPicked || key !== lastAreaKey) return;
+      if (!list || !list.length) {
+        // Street not found: fall back to the ZIP code's center.
+        return fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&postalcode=" + encodeURIComponent(zip))
+          .then(function (r) { return r.json(); });
+      }
+      return list;
+    }).then(function (list) {
+      if (areaPicked || key !== lastAreaKey || !list || !list.length) return;
+      var d = milesFrom(+list[0].lat, +list[0].lon), lim = AREA.radiusMiles || 15;
+      var r = form.querySelector('input[name="area"][value="' + (d <= lim ? "inside" : "outside") + '"]');
+      if (r) { r.checked = true; r.dispatchEvent(new Event("change", { bubbles: true })); }
+      var help = document.getElementById("area-help");
+      if (help) help.textContent = "We checked: that's about " + Math.round(d) + " miles from Silver Spring" +
+        (d <= lim ? ", inside our area." : ". We can still come, with a $" + (AREA.outsideFee || 50) + " travel fee.") + " Change it if that's wrong.";
+    }).catch(function () { /* the customer answers the question themselves */ });
+  }
+  ["address_street", "address_city", "address_zip", "address_state"].forEach(function (n) {
+    var i = form.elements[n];
+    if (i) i.addEventListener("change", checkArea);
+  });
+
+  /* ---------- edit an existing request (quote.html?edit=<id>) ---------- */
+  var editId = qs.get("edit");
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(editId || "")) editId = null;
+  var editToken = null;
+
+  function setRadio(name, value) {
+    var r = value != null && form.querySelector('input[name="' + name + '"][value="' + String(value).replace(/"/g, "") + '"]');
+    if (r) r.checked = true;
+  }
+  function setVal(name, value) { var i = form.elements[name]; if (i) i.value = value == null ? "" : value; }
+
+  function editBanner(d) {
+    var txt = el("div", null, [
+      el("p", null, [el("strong", { text: "Editing request " + d.ref + "." }), document.createTextNode(" Change anything below, then tap Save changes.")])
+    ]);
+    if (d.status === "quoted") txt.appendChild(el("p", { text: "We already sent a quote. Saving sends your request back to us and we'll send a new quote." }));
+    if (!d.contact_editable) txt.appendChild(el("p", { text: "To change your name or phone number, message us from your request page." }));
+    var b = el("div", { "class": "edit-banner", role: "status" }, [icon("i-edit"), txt]);
+    form.insertBefore(b, form.firstChild);
+  }
+
+  function fillForm(d) {
+    setVal("name", d.name); setVal("phone", d.phone); setVal("email", d.email);
+    setRadio("contact_method", d.contact_method);
+    form.elements.email.readOnly = true;
+    form.elements.email.setAttribute("aria-describedby", "email-locked");
+    var ef = fieldWrap("email");
+    if (ef && !document.getElementById("email-locked")) ef.appendChild(el("p", { "class": "field__help", id: "email-locked", text: "Your email is how you sign in, so it can't be changed here." }));
+    if (!d.contact_editable) {
+      ["name", "phone"].forEach(function (n) { form.elements[n].readOnly = true; });
+      form.querySelectorAll('input[name="contact_method"]').forEach(function (i) { i.disabled = !i.checked; });
+    }
+    if (window.DDVehicle) window.DDVehicle.set({ year: d.vehicle_year, make: d.vehicle_make, model: d.vehicle_model, size: d.vehicle_size });
+    else { setVal("vehicle_year", d.vehicle_year); setVal("vehicle_make", d.vehicle_make); setVal("vehicle_model", d.vehicle_model); }
+    setRadio("vehicle_size", d.vehicle_size);
+    setVal("vehicle_color", d.vehicle_color);
+    renderServices(d.service_id);
+    renderAddOns();
+    (d.addon_ids || []).forEach(function (a) { var c = addonBox.querySelector('input[name="addons"][value="' + a + '"]'); if (c) c.checked = true; });
+    setVal("address_street", d.address_street); setVal("address_line2", d.address_line2);
+    setVal("address_city", d.address_city); setVal("address_state", d.address_state); setVal("address_zip", d.address_zip);
+    setRadio("area", d.area);
+    areaPicked = true;
+    setVal("notes", d.notes);
+    if (window.DDSched && window.DDSched.setValue) {
+      window.DDSched.setValue("preferred", d.preferred_date, d.preferred_start);
+      if (d.backup_date && d.backup_start) window.DDSched.setValue("backup", d.backup_date, d.backup_start);
+    }
+    refreshSched();
+  }
+
+  function editFail(err) {
+    var code = err && err.code;
+    var msg, link = el("a", { "class": "btn btn--primary", href: "my-request.html?r=" + encodeURIComponent(editId), text: "Open my request" });
+    if (code === "NOT_ALLOWED") msg = "To change this request, open it and sign in with the code we email you. Then tap Edit request.";
+    else if (code === "BAD_STATUS") msg = "This request can't be changed online anymore. Message us from your request page and we'll update it for you.";
+    else if (code === "NOT_FOUND") msg = "We couldn't find that request.";
+    else msg = (err && err.text) || ("We couldn't load your request. Try again, or call or text " + PHONE + ".");
+    clear(wrap);
+    wrap.appendChild(el("div", { "class": "panel fallback-panel", role: "alert" }, [el("p", { text: msg }), el("div", { "class": "actions", style: "margin-top: var(--s-4)" }, [link])]));
+  }
+
+  function startEdit() {
+    try { editToken = window.localStorage.getItem("dd_edit_" + editId) || null; } catch (e) { editToken = null; }
+    if (window.DDSched && window.DDSched.setExclude) window.DDSched.setExclude(editId);
+    var h1 = document.querySelector(".page-header h1");
+    if (h1) h1.textContent = "Change your request";
+    var sub = document.querySelector(".page-header__sub");
+    if (sub) sub.textContent = "Fix anything you got wrong, pick a different package, or move your time. We'll see the changes right away.";
+    btn.lastChild.textContent = "Save changes";
+    btnKids = null;
+    if (!window.DD || !window.DD.ok) { editFail({ code: "NETWORK", text: (window.DD && window.DD.ERR && window.DD.ERR.NETWORK) || "" }); return; }
+    form.setAttribute("aria-busy", "true");
+    window.DD.rpc("get_request_edit", { p_request: editId, p_token: editToken }).then(function (d) {
+      form.removeAttribute("aria-busy");
+      editBanner(d);
+      fillForm(d);
+    }, editFail);
+  }
+
+  function editSubmit() {
+    setLoading(true);
+    window.DD.rpc("update_request", { p_request: editId, p: portalPayload(), p_token: editToken }).then(function (res) {
+      try {
+        window.sessionStorage.setItem("dd_ref", res && res.ref ? String(res.ref) : "");
+        window.sessionStorage.setItem("dd_toast", "Your changes were saved. We'll send your quote during office hours.");
+      } catch (e) { /* ignore */ }
+      window.DD.auth.session().then(function (s) {
+        go("my-request.html?r=" + encodeURIComponent(editId) + (s ? "" : "&new=1&updated=1"));
+      }, function () { go("my-request.html?r=" + encodeURIComponent(editId) + "&new=1&updated=1"); });
+    }, function (err) {
+      setLoading(false);
+      var code = err && err.code, text = (err && err.text) || "";
+      if (code === "SLOT_TAKEN") { slotTaken(text); return; }
+      if (code === "INVALID") {
+        var map = { addons: "service", service: "service", range: "preferred_date" };
+        var field = map[err.field] || err.field;
+        if (field && fieldWrap(field) && controlOf(field)) { setError(field, text); renderSummary([field]); return; }
+      }
+      if (code === "BAD_STATUS" || code === "NOT_ALLOWED") { editFail(err); return; }
+      showSendError(text);
+    });
+  }
+
+  if (editId) startEdit();
 
   /* ---------- square / external mode ---------- */
   var mode = SITE.getBookingMode ? SITE.getBookingMode() : { mode: "quote" };

@@ -249,7 +249,7 @@
      ===================================================================== */
   var REQ_COLS = "id,ref,customer_id,vehicle_id,address_id,service_id,addon_ids,preferred_date,preferred_start,backup_date,backup_start," +
     "notes,status,quote_amount,quote_note,quoted_at,scheduled_date,scheduled_start,duration_min,buffer_min,assigned,paid,paid_amount," +
-    "paid_method,paid_at,cancelled_by,cancel_reason,source,created_at,started_at,finished_at,work_started_at,work_seconds," +
+    "paid_method,paid_at,cancelled_by,cancel_reason,source,created_at,started_at,finished_at,work_started_at,work_seconds,outside_area," +
     "customers(id,name,phone,email,contact_method),vehicles(year,make,model,size,color),addresses(street,line2,city,state,zip)";
 
   function pickSlot(root, ymd, time) {
@@ -753,6 +753,7 @@
       row("Size", [(v && v.size) || "Not given"]);
       row("Color", [(v && v.color) || "Not given"]);
       row("Address", a ? [a.line2 ? a.street + ", " + a.line2 : a.street, a.city + ", " + a.state + " " + a.zip] : ["Not available"]);
+      if (r.outside_area) row("Service area", ["Outside 15 miles: add the $50 travel fee"]);
       var tl = [];
       if (r.scheduled_date && r.scheduled_start) tl.push("Booked: " + whenText(r.scheduled_date, r.scheduled_start) + " (" + r.duration_min + " min + " + r.buffer_min + " min travel)");
       if (r.preferred_date && r.preferred_start) tl.push("Preferred: " + whenText(r.preferred_date, r.preferred_start));
@@ -921,6 +922,7 @@
           case "time_declined": label = "Time suggestion declined"; break;
           case "time_withdrawn": label = "Time suggestion withdrawn"; break;
           case "time_changed": label = "Time updated"; break;
+          case "edited": label = "Customer changed the request"; break;
           case "paid": label = "Payment recorded"; break;
           default: label = "";
         }

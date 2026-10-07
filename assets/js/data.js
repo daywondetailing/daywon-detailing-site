@@ -3,6 +3,7 @@ window.SITE_DATA = {
   services: [
     {
       id: "express-refresh",
+      startingAt: 75, // starting price; the final quote depends on vehicle size and condition
       name: "Express Refresh",
       duration: "1 hr",
       summary: "A quick interior and exterior maintenance clean for vehicles that are lightly dirty and regularly maintained. This package is best for customers who want their car looking clean, refreshed, and protected without needing deep extraction or heavy stain removal.",
@@ -28,6 +29,7 @@ window.SITE_DATA = {
     },
     {
       id: "full-interior-exterior",
+      startingAt: 150, // starting price; the final quote depends on vehicle size and condition
       name: "Full Interior + Exterior Detail",
       duration: "2 hr",
       summary: "A more thorough reset for daily-driven vehicles that need deeper cleaning inside and a complete exterior wash and protection service. This package is ideal for normal daily buildup, light stains, dust in cracks and crevices, and interiors that need more than a simple vacuum and wipe-down.",
@@ -58,6 +60,7 @@ window.SITE_DATA = {
     },
     {
       id: "deep-restoration",
+      startingAt: 250, // starting price; the final quote depends on vehicle size and condition
       name: "Deep Restoration Detail",
       duration: "3 hr",
       summary: "Our most thorough package for vehicles with heavy dirt, stains, embedded debris, neglected carpets or seats, and interiors needing a serious reset. This package combines intensive vacuuming, Tornador blowout, steam cleaning, carpet treatment, and extraction to give your vehicle the deepest clean we offer.",
@@ -94,6 +97,7 @@ window.SITE_DATA = {
     },
     {
       id: "interior-only",
+      startingAt: 50, // starting price; the final quote depends on vehicle size and condition
       name: "Interior Only Detail",
       duration: null,
       summary: "A thorough interior clean for daily-driven vehicles, without the exterior wash.",
@@ -115,6 +119,7 @@ window.SITE_DATA = {
     },
     {
       id: "exterior-only",
+      startingAt: 25, // starting price; the final quote depends on vehicle size and condition
       name: "Exterior Only Detail",
       duration: null,
       summary: "A complete exterior wash for daily-driven vehicles, without the interior work.",
@@ -130,6 +135,27 @@ window.SITE_DATA = {
       addOnIds: ["spray-wax", "tire-shine"],
       bookingUrls: {}
     }
+  ],
+  /* Compare chart on the home page. Per package: true = included, "addon" = available as an add-on,
+     a string = included with that note, missing = not included. Columns follow `services` order. */
+  compare: [
+    { group: "Interior" },
+    { label: "Vacuum of carpets, mats, seats and trunk", "express-refresh": true, "full-interior-exterior": "Thorough", "deep-restoration": "Intensive", "interior-only": "Thorough" },
+    { label: "Tornador blowout of dust and debris", "express-refresh": true, "full-interior-exterior": true, "deep-restoration": "Detailed", "interior-only": true },
+    { label: "Interior wipe-down", "express-refresh": "Light", "full-interior-exterior": true, "deep-restoration": "Thorough", "interior-only": true },
+    { label: "Interior windows and screens", "express-refresh": true, "full-interior-exterior": true, "deep-restoration": true, "interior-only": true },
+    { label: "Steam cleaning", "full-interior-exterior": true, "deep-restoration": true, "interior-only": true },
+    { label: "Spot treatment for stains", "full-interior-exterior": "Light stains", "deep-restoration": true, "interior-only": "Light stains" },
+    { label: "Seat rails, door pockets and crevices", "full-interior-exterior": true, "deep-restoration": "Deep clean", "interior-only": true },
+    { label: "Carpet bomber treatment", "deep-restoration": true },
+    { label: "Carpet extraction", "express-refresh": "addon", "full-interior-exterior": "addon", "deep-restoration": true, "interior-only": "addon", addOn: "carpet-extraction" },
+    { label: "Cloth seat extraction", "express-refresh": "addon", "full-interior-exterior": "addon", "deep-restoration": true, "interior-only": "addon", addOn: "seat-extraction" },
+    { group: "Exterior" },
+    { label: "Contact hand wash", "express-refresh": true, "full-interior-exterior": true, "deep-restoration": true, "exterior-only": true },
+    { label: "Pre-wash to loosen dirt and grime", "full-interior-exterior": true, "deep-restoration": true, "exterior-only": true },
+    { label: "Tires and rims cleaned", "express-refresh": true, "full-interior-exterior": "Scrubbed", "deep-restoration": "Pressure washed", "exterior-only": "Scrubbed" },
+    { label: "Tire shine", "express-refresh": "addon", "full-interior-exterior": "addon", "deep-restoration": true, "exterior-only": "addon", addOn: "tire-shine" },
+    { label: "Spray wax", "express-refresh": "addon", "full-interior-exterior": "addon", "deep-restoration": true, "exterior-only": "addon", addOn: "spray-wax" }
   ],
   addOns: [
     { id: "spray-wax", name: "Spray wax", price: 20, extraTime: null, area: "exterior" },

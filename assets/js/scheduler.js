@@ -3,7 +3,8 @@
    and, when present, <prefix>_start (HH:MM, wall-clock America/New_York).
    Working hours come from SITE_CONFIG.schedule in config.js (offline fallback). When the portal is reachable,
    hours, days ahead, slot length, taken jobs and time off come from get_availability instead.
-   Exposes window.DDSched = { init(root, opts), refreshAll(), availability(), getMinutes }. */
+   Add data-optional to the root to show a "Clear" button (backup choice).
+   Exposes window.DDSched = { init(root, opts), refreshAll(), availability(), getMinutes, setExclude(id), setValue(prefix, ymd, hhmm) }. */
 (function () {
   "use strict";
 
@@ -15,11 +16,12 @@
   var DOW = ["S", "M", "T", "W", "T", "F", "S"];
   var DOW_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var STAFF_HOURS = [7, 20];
-  var TAKEN_MSG = "That window was just taken. Pick another.";
+  var TAKEN_MSG = "That time is not open anymore (it was booked, or your job is now longer). Pick another.";
 
   var instances = [];
   var shared = null;      // availability JSON from get_availability, once loaded
   var fetching = false;
+  var exclude = null;     // request being edited: its own time is not "taken"
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
@@ -56,13 +58,15 @@
     fetching = true;
     var from = addDays(startOfDay(new Date()), -1);
     var to = addDays(from, 181);
-    window.DD.availability(iso(from), iso(to)).then(function (a) {
+    var ex = exclude;
+    window.DD.availability(iso(from), iso(to), exclude).then(function (a) {
+      if (ex !== exclude) return;   // a newer fetch (different request being edited) is on its way
       fetching = false;
       if (a && typeof a === "object" && a.hours) {
         shared = a;
         instances.forEach(function (i) { i.setAvail(); });
       }
-    }, function () { fetching = false; /* keep config fallback */ });
+    }, function () { if (ex === exclude) fetching = false; /* keep config fallback */ });
   }
 
   function init(root, opts) {
@@ -97,7 +101,8 @@
     function offFor(date) {
       var out = [];
       var key = iso(date);
-      var list = (A && A.off) || [];
+      var av = A || shared;
+      var list = (av && av.off) || [];
       for (var i = 0; i < list.length; i++) {
         var o = list[i];
         if (o && o.start_date <= key && o.end_date >= key) out.push(o);
@@ -110,10 +115,11 @@
     }
     function isOpen(date) { return !!hoursFor(date) && !fullyOff(date); }
     function isTaken(date, t) {
-      if (!A) return false;
+      var av = A || shared;
+      if (!av) return false;
       var m = jobMinutes();
       var key = iso(date);
-      var busy = A.busy || [];
+      var busy = av.busy || [];
       for (var i = 0; i < busy.length; i++) {
         var b = busy[i];
         if (!b || b.date !== key) continue;
@@ -135,7 +141,7 @@
       return false;
     }
     function isOffSlot(date, t) {
-      if (!staff || !A) return false;
+      if (!staff || !(A || shared)) return false;
       var m = jobMinutes();
       var offs = offFor(date);
       for (var j = 0; j < offs.length; j++) {
@@ -186,6 +192,19 @@
     var summary = el("p", "sched__summary");
     summary.setAttribute("aria-live", "polite");
     root.appendChild(head); root.appendChild(grid); root.appendChild(slotsBox); root.appendChild(summary);
+    var clearBtn = null;
+    if (root.hasAttribute("data-optional")) {
+      clearBtn = el("button", "sched__clear", "Clear this choice");
+      clearBtn.type = "button";
+      clearBtn.hidden = true;
+      clearBtn.addEventListener("click", function () {
+        selectedDate = null; notice = "";
+        dateInput.value = "";
+        setStart("", 0);
+        renderMonth(); renderSlots(); setSummary(); notify();
+      });
+      root.appendChild(clearBtn);
+    }
 
     function notify() {
       dateInput.dispatchEvent(new Event("input", { bubbles: true }));
@@ -196,6 +215,7 @@
     }
 
     function setSummary() {
+      if (clearBtn) clearBtn.hidden = !selectedDate;
       if (selectedDate && timeInput.value) {
         summary.textContent = "Selected: " + DOW_FULL[selectedDate.getDay()] + ", " +
           selectedDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) + ", " + timeInput.value;
@@ -204,7 +224,7 @@
       } else if (selectedDate) {
         summary.textContent = "Now choose an arrival window.";
       } else {
-        summary.textContent = "Choose a day to see arrival windows.";
+        summary.textContent = clearBtn ? "Optional. Choose a day to see arrival windows." : "Choose a day to see arrival windows.";
       }
     }
 
@@ -308,7 +328,18 @@
     compute();
     renderMonth(); renderSlots(); setSummary();
 
-    instances.push({ setAvail: refresh, refresh: refresh });
+    /* Pre-select a saved date and start time (editing a request). */
+    function setValue(ymd, hhmm) {
+      var d = parseYmd(ymd), t = parseHm(hhmm);
+      if (!d || t == null) return;
+      selectedDate = d;
+      dateInput.value = iso(d);
+      setStart(windowLabel(t, t + SLOT), t);
+      view = new Date(d.getFullYear(), d.getMonth(), 1);
+      refresh();
+    }
+
+    instances.push({ prefix: prefix, setAvail: refresh, refresh: refresh, setValue: setValue });
     if (!opts.availability) fetchShared();
     if (shared && !opts.availability) refresh();
   }
@@ -317,7 +348,17 @@
     init: init,
     refreshAll: function () { instances.forEach(function (i) { i.refresh(); }); },
     availability: function () { return shared; },
-    getMinutes: null
+    getMinutes: null,
+    setExclude: function (id) {
+      exclude = id || null;
+      shared = null;
+      if (window.DD && window.DD.availability && window.DD.availability.clear) window.DD.availability.clear();
+      fetching = false;
+      fetchShared();
+    },
+    setValue: function (prefix, ymd, hhmm) {
+      instances.forEach(function (i) { if (i.prefix === prefix) i.setValue(ymd, hhmm); });
+    }
   };
 
   document.querySelectorAll("[data-sched]").forEach(function (r) { init(r); });

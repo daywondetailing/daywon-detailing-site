@@ -38,12 +38,13 @@ window.SITE_CONFIG = {
     }
   },
   contact: {
-    phoneDisplay: "240-579-5092",
-    phoneE164: "+12405795092",
+    phoneDisplay: "240-813-0689",
+    phoneE164: "+12408130689",
     email: "daywondetailing@gmail.com",
     instagram: "daywondetailing",
     tiktok: "daywon.detailing",
     facebook: "" // PLACEHOLDER: add the Facebook page URL when it exists
   },
-  serviceArea: { center: "Silver Spring, MD", radiusMiles: 15 }
+  /* Map center is downtown Silver Spring. Addresses farther than radiusMiles can still book with the travel fee. */
+  serviceArea: { center: "Silver Spring, MD", radiusMiles: 15, lat: 38.9907, lng: -77.0261, outsideFee: 50 }
 };

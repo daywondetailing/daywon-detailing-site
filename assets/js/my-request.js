@@ -6,7 +6,7 @@
 
   var DD = window.DD || { ok: false };
   var CFG = window.SITE_CONFIG || {};
-  var PHONE = (CFG.contact && CFG.contact.phoneDisplay) || "240-579-5092";
+  var PHONE = (CFG.contact && CFG.contact.phoneDisplay) || "240-813-0689";
   var TIMEOUT = (CFG.portal && CFG.portal.timeoutMs) || 10000;
   var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   var CHANGEABLE = ["new", "quoted", "approved", "scheduled"];
@@ -56,6 +56,17 @@
     n.textContent = "";
     setTimeout(function () { n.textContent = text; }, 50);
   }
+  function editHref(id) { return "quote.html?edit=" + encodeURIComponent(id); }
+  /* Link to calendar.html, which offers Google, Apple and Outlook. */
+  function calendarHref(r) {
+    if (!r.scheduled_date || !r.scheduled_start) return "";
+    var a = S.addr;
+    var loc = a ? [a.line2 ? a.street + ", " + a.line2 : a.street, a.city + ", " + a.state + " " + a.zip].join(", ") : "";
+    var t = String(r.scheduled_start).slice(0, 5).replace(":", "");
+    return "calendar.html?s=" + String(r.scheduled_date).replace(/-/g, "") + "T" + t +
+      "&m=" + (r.duration_min || 120) + "&svc=" + encodeURIComponent(DD.service(r.service_id)) +
+      "&ref=" + encodeURIComponent(r.ref || "") + "&loc=" + encodeURIComponent(loc) + "&r=" + encodeURIComponent(r.id);
+  }
   function whenText(d, t) { return d && t ? DD.fmt.date(d) + ", arrival " + DD.fmt.window(t) : ""; }
   function stLabel(st) { return (DD.STATUS[st] && DD.STATUS[st].customer) || st; }
   function sentDate(ts) {
@@ -66,7 +77,7 @@
     return d.toLocaleDateString("en-US", o);
   }
   function phoneLink(text) {
-    return el("a", { href: "tel:+12405795092" }, [text || PHONE]);
+    return el("a", { href: "tel:+12408130689" }, [text || PHONE]);
   }
 
   /* ---------- db (explicit columns, timeout, friendly errors) ---------- */
@@ -129,7 +140,7 @@
     retry.addEventListener("click", function () { renderLoading(""); enter(); });
     v.appendChild(el("h1", { id: "h-loading", tabindex: "-1", text: "We couldn't load your request" }));
     v.appendChild(el("div", { "class": "error-summary", role: "alert" }, [el("p", { text: errText })]));
-    v.appendChild(el("div", { "class": "actions" }, [retry, el("a", { "class": "btn btn--ghost", href: "tel:+12405795092" }, ["Call or text " + PHONE])]));
+    v.appendChild(el("div", { "class": "actions" }, [retry, el("a", { "class": "btn btn--ghost", href: "tel:+12408130689" }, ["Call or text " + PHONE])]));
   }
   function showNotFound() {
     unsubscribe();
@@ -162,10 +173,21 @@
       var ref = "";
       try { ref = window.sessionStorage.getItem("dd_ref") || ""; } catch (e) { ref = ""; }
       banner.appendChild(DD.icon("i-check"));
-      banner.appendChild(el("p", {
-        text: (ref ? "Request " + ref + " sent." : "Your request was sent.") +
-          " We reply within 1 to 2 hours. To follow it here, enter your email below and tap \"Email me a code\"."
-      }));
+      var rid = (/(?:^|[?&])r=([^&]+)/.exec(window.location.search) || [])[1] || "";
+      var tok = "";
+      try { tok = rid ? window.localStorage.getItem("dd_edit_" + decodeURIComponent(rid)) || "" : ""; } catch (e) { tok = ""; }
+      var bp = el("p", {
+        text: (/(?:^|[?&])updated=1(?:&|$)/.test(window.location.search)
+          ? (ref ? "Request " + ref + " updated." : "Your changes were saved.")
+          : (ref ? "Request " + ref + " sent." : "Your request was sent.")) +
+          " We reply during our office hours. To follow it here, enter your email below and tap \"Email me a code\"."
+      });
+      if (tok) {
+        bp.appendChild(document.createTextNode(" Made a mistake or want a different package? "));
+        bp.appendChild(el("a", { href: editHref(decodeURIComponent(rid)), text: "Edit your request" }));
+        bp.appendChild(document.createTextNode("."));
+      }
+      banner.appendChild(bp);
       banner.hidden = false;
     } else {
       banner.hidden = true;
@@ -360,7 +382,13 @@
   }
 
   /* ---------- render ---------- */
+  function savedToast() {
+    var t = "";
+    try { t = window.sessionStorage.getItem("dd_toast") || ""; window.sessionStorage.removeItem("dd_toast"); } catch (e) { t = ""; }
+    if (t) DD.toast(t, "success");
+  }
   function renderAll() {
+    savedToast();
     renderHead();
     renderSwitcher();
     renderNext();
@@ -412,7 +440,8 @@
 
     if (st === "new") {
       kids.push(title("We're preparing your quote."));
-      kids.push(text("We reply within 1 to 2 hours."));
+      kids.push(text("We reply during our office hours. Need to fix something or change your package? You can edit your request until we send the quote."));
+      actions = [el("a", { "class": "btn btn--ghost", href: editHref(r.id) }, [DD.icon("i-edit"), document.createTextNode("Edit request")])];
     } else if (st === "quoted") {
       var amt = r.quote_amount != null ? DD.fmt.money(r.quote_amount) : "";
       kids.push(el("h2", { "class": "next-step__title", id: "h-next" }, [
@@ -428,12 +457,16 @@
       });
       var ask = el("button", { type: "button", "class": "btn btn--ghost", text: "Ask for a different time" });
       ask.addEventListener("click", openChange);
-      actions = [acc, ask];
+      var chg = el("a", { "class": "btn btn--ghost", href: editHref(r.id) }, [DD.icon("i-edit"), document.createTextNode("Change package or details")]);
+      actions = [acc, ask, chg];
+      kids.push(el("p", { "class": "next-step__text muted", text: "Changing your package or details sends the request back to us for a new quote." }));
     } else if (st === "approved") {
       kids.push(title("Thanks. We're confirming your booking."));
     } else if (st === "scheduled") {
       kids.push(title("You're booked for " + whenText(r.scheduled_date, r.scheduled_start) + "."));
       kids.push(text("You pay after the job is done: tap to pay, cash, Zelle or Cash App."));
+      var cal = calendarHref(r);
+      if (cal) actions = [el("a", { "class": "btn btn--primary", href: cal }, [DD.icon("i-calendar"), document.createTextNode("Add to calendar")])];
     } else if (st === "on_the_way") {
       kids.push(title("We're on the way."));
     } else if (st === "in_progress") {
@@ -532,6 +565,7 @@
         case "time_accepted": label = "New time confirmed"; break;
         case "time_declined": label = "Time suggestion declined"; break;
         case "time_changed": label = "Time updated"; break;
+        case "edited": label = "You changed your request"; break;
         case "paid": label = "Payment received"; break;
         default: label = "";
       }

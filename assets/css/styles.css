@@ -681,3 +681,121 @@ html.js-motion .hero__title.is-sheen::after {
 .about .about__list { margin-top: var(--s-7); border-top: 0; gap: var(--s-4); text-align: left; }
 .about .about__list li { border: 1px solid var(--ink-700); border-radius: var(--r-md); padding: var(--s-5); background: var(--ink-900); }
 @media (min-width: 700px) { .about .about__list { grid-template-columns: 1fr 1fr; } }
+
+/* ---------- Round 4 (2026-10-06): compare chart, map, office hours, vehicle search, edit mode ---------- */
+.quote-starter__links { margin: calc(-1 * var(--s-2)) 0 var(--s-3); }
+.quote-starter__links .link-arrow { min-height: 36px; color: var(--blue-300); }
+.quote-starter__note a { color: var(--blue-300); }
+
+/* Compare chart */
+.compare-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-6); }
+.compare-head .link-arrow { color: var(--blue-300); }
+.compare { overflow-x: auto; border: 1px solid var(--ink-700); border-radius: var(--r-md); background: var(--ink-950); -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.compare:focus-visible { outline: 2px solid var(--blue-300); outline-offset: 3px; }
+.compare__hint { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3); font-size: var(--fs-sm); color: var(--ink-300); }
+.compare__hint .icon { width: 1rem; height: 1rem; }
+@media (min-width: 1100px) { .compare__hint { display: none; } }
+.compare__table { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 0; font-size: var(--fs-sm); }
+.compare__table th, .compare__table td { padding: 14px 12px; border-bottom: 1px solid var(--ink-800); text-align: center; vertical-align: middle; }
+.compare__table tbody tr:hover td, .compare__table tbody tr:hover .compare__label { background-color: var(--ink-900); }
+.compare__table thead th { vertical-align: bottom; padding-top: var(--s-5); border-bottom: 1px solid var(--ink-700); }
+.compare__corner, .compare__label, .compare__table tfoot th { position: sticky; left: 0; z-index: 1; background: var(--ink-950); text-align: left; }
+.compare__corner { color: var(--ink-300); }
+.compare__label { font-weight: 500; color: var(--ink-100); min-width: 200px; max-width: 240px; line-height: 1.35; box-shadow: 1px 0 0 var(--ink-800); }
+.compare__pkg { min-width: 128px; }
+.compare__name { display: block; font-family: var(--font-display); font-stretch: 112%; font-weight: 800; font-size: var(--fs-base); line-height: 1.15; color: var(--white); }
+.compare__price { display: grid; margin-top: var(--s-3); }
+.compare__price-label { font-size: var(--fs-xs); color: var(--ink-300); font-weight: 500; }
+.compare__price-value { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; font-size: 1.75rem; line-height: 1.1; color: var(--white); font-variant-numeric: tabular-nums; }
+.compare__time { display: block; margin-top: var(--s-1); font-size: var(--fs-xs); color: var(--ink-300); }
+.compare__badge { display: inline-block; margin-bottom: var(--s-2); padding: 3px 10px; border-radius: var(--r-pill); background: var(--blue-600); color: #fff; font-size: var(--fs-xs); font-weight: 700; letter-spacing: .02em; }
+.compare__table .is-featured { background: rgb(59 130 246 / .08); }
+.compare__table thead .is-featured { box-shadow: inset 0 3px 0 var(--blue-500); }
+.compare__table tbody tr:hover td.is-featured { background-color: rgb(59 130 246 / .14); }
+.compare__group th { position: sticky; left: 0; padding-top: var(--s-5); text-align: left; background: var(--ink-950); font-family: var(--font-display); font-stretch: 125%; font-weight: 700; font-size: var(--fs-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--blue-300); }
+.compare__yes { width: 22px; height: 22px; margin-inline: auto; color: var(--success); stroke-width: 2.5; }
+.compare__note { display: block; margin-top: 2px; font-size: var(--fs-xs); color: var(--ink-300); }
+.compare__no { color: var(--ink-700); font-size: var(--fs-lg); }
+.compare__addon span { display: inline-block; padding: 2px 8px; border: 1px solid var(--ink-700); border-radius: var(--r-pill); font-size: var(--fs-xs); color: var(--ink-300); white-space: nowrap; }
+.compare__table tfoot th, .compare__table tfoot td { border-bottom: 0; padding-block: var(--s-5); }
+.compare__table tfoot .link-arrow { color: var(--blue-300); font-size: var(--fs-sm); }
+.compare__cta { min-height: 44px; padding-inline: 16px; font-size: var(--fs-sm); white-space: nowrap; }
+
+/* Job sheet price (services page) */
+.job-sheet__price { display: flex; align-items: baseline; gap: var(--s-2); margin: 0 0 var(--s-4); }
+.job-sheet__price-label { font-size: var(--fs-sm); color: var(--ink-300); }
+.job-sheet__price-value { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; font-size: var(--fs-xl); color: var(--white); }
+
+/* Service area map */
+.area { display: grid; gap: var(--s-7); align-items: center; }
+@media (min-width: 960px) { .area { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s-8); } }
+.area__copy > p { color: var(--ink-300); max-width: 56ch; }
+.area-check { margin-top: var(--s-5); display: grid; gap: var(--s-2); }
+.area-check__row { display: flex; gap: var(--s-2); }
+.area-check__row input { flex: 1; min-width: 0; min-height: 48px; padding: 12px 14px; background: var(--ink-800); color: var(--ink-100); border: 1px solid var(--ink-700); border-radius: var(--r-sm); }
+.area-check__row input:focus { border-color: var(--blue-500); outline: 2px solid var(--blue-300); outline-offset: 2px; }
+.area-check__result { min-height: 1.5em; font-size: var(--fs-sm); color: var(--ink-300); }
+.area-check__result.is-ok { color: var(--success); }
+.area-check__result.is-warn { color: #FCD34D; }
+.area__fee { display: flex; gap: var(--s-3); align-items: flex-start; margin-top: var(--s-5); padding: var(--s-4) var(--s-5); border: 1px solid var(--ink-700); border-left: 3px solid var(--blue-500); border-radius: var(--r-sm); background: var(--ink-950); }
+.area__fee .icon { flex: none; width: 22px; height: 22px; margin-top: 2px; color: var(--blue-300); }
+.area__fee p { color: var(--ink-300); }
+.area__fee strong { color: var(--white); }
+.area-map { margin: 0; }
+.area-map__canvas { position: relative; height: clamp(320px, 62vw, 480px); border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--ink-700); background: var(--ink-800); z-index: 0; }
+.area-map__canvas:not(.is-ready)::after { content: "Loading map…"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-300); font-size: var(--fs-sm); }
+.area-map__canvas.is-failed::after { content: "The map couldn't load. We serve 15 miles around Silver Spring, MD."; padding: var(--s-5); text-align: center; }
+.area-map .area-figure__caption { text-align: left; }
+.area-map__tip { font-family: var(--font-body); font-weight: 700; font-size: 12px; color: var(--slate-900); }
+.leaflet-container { font-family: var(--font-body); }
+.leaflet-container a { color: var(--blue-700); }
+
+/* Office hours */
+.hours { display: grid; gap: var(--s-6); align-items: start; }
+@media (min-width: 960px) { .hours { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: var(--s-8); } }
+.hours__copy > p { color: var(--ink-300); max-width: 52ch; margin-top: var(--s-3); }
+.hours__copy > .hours__now { display: inline-flex; align-items: center; gap: var(--s-2); margin-top: var(--s-2); padding: 6px 14px; border-radius: var(--r-pill); border: 1px solid var(--ink-700); font-weight: 600; color: var(--ink-100); }
+.hours__now::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-400); }
+.hours__now.is-open::before { background: var(--success); box-shadow: 0 0 0 4px rgb(94 224 160 / .18); }
+.hours__now:empty { display: none; }
+.hours__list { list-style: none; display: grid; gap: 0; }
+.panel.hours__list { padding-block: var(--s-3); }
+.hours__row { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); padding: 12px 0; border-bottom: 1px solid var(--ink-800); }
+.hours__row:last-child { border-bottom: 0; }
+.hours__day { display: inline-flex; align-items: center; gap: var(--s-2); font-weight: 600; color: var(--ink-100); }
+.hours__time { font-variant-numeric: tabular-nums; color: var(--ink-300); }
+.hours__row.is-closed .hours__time { color: var(--ink-400); }
+.hours__row.is-today .hours__day, .hours__row.is-today .hours__time { color: var(--white); }
+.hours__today { padding: 1px 8px; border-radius: var(--r-pill); background: var(--blue-600); color: #fff; font-size: var(--fs-xs); font-weight: 700; }
+
+/* Quote form: vehicle search */
+.vsearch { position: relative; }
+.vsearch__list { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); max-height: 320px; overflow-y: auto; list-style: none; padding: var(--s-1); margin: 0; background: var(--ink-800); border: 1px solid var(--ink-700); border-radius: var(--r-sm); box-shadow: 0 18px 40px -12px rgb(0 0 0 / .6); }
+.vsearch__opt { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); padding: 10px 12px; border-radius: 4px; cursor: pointer; color: var(--ink-100); }
+.vsearch__opt[aria-selected="true"], .vsearch__opt:hover { background: var(--ink-700); }
+.vsearch__opt small { color: var(--ink-300); font-size: var(--fs-xs); white-space: nowrap; }
+.vsearch__empty { padding: 10px 12px; color: var(--ink-300); font-size: var(--fs-sm); }
+.vsearch__picked { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); padding: 12px 14px; border: 1px solid var(--blue-500); border-radius: var(--r-sm); background: rgb(59 130 246 / .08); }
+.vsearch__picked strong { color: var(--white); }
+.vsearch__picked .icon { color: var(--blue-300); }
+.vsearch__change { margin-left: auto; color: var(--blue-300); font-weight: 600; text-decoration: underline; min-height: 32px; }
+.vsearch__manual { justify-self: start; color: var(--blue-300); font-size: var(--fs-sm); font-weight: 600; text-decoration: underline; min-height: 32px; }
+.vsearch__credit { font-size: var(--fs-xs); color: var(--ink-400); }
+.choice__price { color: var(--blue-300); font-weight: 700; }
+.sched__clear { justify-self: start; margin-top: var(--s-2); color: var(--blue-300); font-size: var(--fs-sm); font-weight: 600; text-decoration: underline; min-height: 32px; }
+
+/* Quote form: editing an existing request */
+.edit-banner { display: flex; gap: var(--s-3); align-items: flex-start; margin-bottom: var(--s-6); padding: var(--s-4) var(--s-5); border: 1px solid var(--blue-500); border-radius: var(--r-md); background: rgb(59 130 246 / .08); }
+.edit-banner .icon { flex: none; width: 22px; height: 22px; margin-top: 2px; color: var(--blue-300); }
+.edit-banner strong { color: var(--white); }
+.edit-banner p { color: var(--ink-300); }
+.field__static { padding: 12px 14px; border: 1px dashed var(--ink-700); border-radius: var(--r-sm); color: var(--ink-300); }
+.quote-aside__sub { margin-top: var(--s-5); font-size: var(--fs-base); }
+.quote-aside .hours__list { margin: var(--s-2) 0 var(--s-4); font-size: var(--fs-sm); }
+.quote-aside .hours__row { padding: 6px 0; }
+.panel.hours__list { padding: var(--s-3) var(--s-5); }
+@media (min-width: 600px) { .panel.hours__list { padding: var(--s-3) var(--s-6); } }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.compare__table .compare__label, .compare__table .compare__corner, .compare__table tfoot th, .compare__table .compare__group th { text-align: left; }
+@media (max-width: 599px) { .compare__table { min-width: 640px; font-size: var(--fs-xs); } .compare__table .compare__label { min-width: 128px; max-width: 140px; padding-inline: 10px; } .compare__pkg { min-width: 104px; } .compare__table th, .compare__table td { padding: 12px 8px; } .compare__price-value { font-size: 1.375rem; } .compare__name { font-size: var(--fs-sm); } }
+[data-contact="phone"] { white-space: nowrap; }
