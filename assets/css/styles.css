@@ -810,7 +810,12 @@ html.js-motion .hero__title.is-sheen::after {
 .compare__table .is-featured .compare__yes { background: rgb(94 224 160 / .24); }
 .compare__no { display: inline-block; width: 14px; height: 2px; vertical-align: middle; background: var(--ink-700); font-size: 0; }
 .compare__note { margin-top: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-100); }
-.compare__table tbody tr:nth-child(even) td, .compare__table tbody tr:nth-child(even) .compare__label { background-color: rgb(255 255 255 / .015); }
+.compare__table tbody tr:nth-child(even) td { background-color: rgb(255 255 255 / .015); }
+/* Sticky first column must stay opaque so swiped marks pass underneath it. */
+.compare__table tbody tr:nth-child(even) .compare__label { background-image: linear-gradient(rgb(255 255 255 / .015), rgb(255 255 255 / .015)); }
+.compare__corner, .compare__label, .compare__table tfoot th { z-index: 2; }
+.compare__group th { position: static; }
+.compare__group-label { position: sticky; left: 12px; }
 .compare__table tbody td { padding-block: 16px; }
 @media (max-width: 599px) { .compare__yes { width: 28px; height: 28px; padding: 5px; } }
 /* Color buttons */

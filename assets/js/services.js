@@ -226,7 +226,8 @@
       var tr = el('tr');
       if (r.group) {
         tr.className = 'compare__group';
-        var g = el('th', null, r.group);
+        var g = el('th');
+        g.appendChild(el('span', 'compare__group-label', r.group));
         g.scope = 'colgroup';
         g.colSpan = services.length + 1;
         tr.appendChild(g);
