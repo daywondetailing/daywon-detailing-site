@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /manage.html
 Disallow: /my-request.html
+Disallow: /checklist.html

@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="assets/img/logo.jpg">
+<title>Daywon Job Checklist</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#05070A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky job bar (package tabs + progress + timer) over a single column of numbered work phases, each a stack of big tap-to-check rows. Tokens follow the Daywon site: ink ground, blue accent. */
+:root {
+  --bg: #05070A; --surface: #0B0F16; --raised: #131A24; --line: #232E3D;
+  --fg: #E7ECF3; --strong: #FFFFFF; --muted: #93A1B5;
+  --accent: #3B82F6; --accent-strong: #8DB8FF; --accent-ink: #FFFFFF; --accent-soft: rgb(59 130 246 / .14);
+  --good: #5EE0A0; --good-soft: rgb(94 224 160 / .12); --warn: #F5C451;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 14px; --r-sm: 8px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #EEF2F7; --surface: #FFFFFF; --raised: #F6F8FB; --line: #D5DDE8;
+    --fg: #1B2430; --strong: #0B0F16; --muted: #5A6878;
+    --accent: #1F63E0; --accent-strong: #174BB0; --accent-ink: #FFFFFF; --accent-soft: rgb(31 99 224 / .10);
+    --good: #12805A; --good-soft: rgb(18 128 90 / .10); --warn: #9A6400;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #EEF2F7; --surface: #FFFFFF; --raised: #F6F8FB; --line: #D5DDE8;
+  --fg: #1B2430; --strong: #0B0F16; --muted: #5A6878;
+  --accent: #1F63E0; --accent-strong: #174BB0; --accent-ink: #FFFFFF; --accent-soft: rgb(31 99 224 / .10);
+  --good: #12805A; --good-soft: rgb(18 128 90 / .10); --warn: #9A6400;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1.0625rem/1.5 var(--font-body); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent-strong); outline-offset: 2px; }
+.wrap { max-width: 46rem; margin: 0 auto; padding-inline: 16px; }
+
+/* ---- top bar ---- */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.bar__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px 8px; }
+.brand { font-family: var(--font-display); font-stretch: 115%; font-weight: 800; font-size: 1.05rem; letter-spacing: .01em; color: var(--strong); margin: 0; }
+.brand small { display: block; font-family: var(--font-body); font-stretch: 100%; font-weight: 600; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.timer { display: flex; align-items: center; gap: 8px; }
+.timer__clock { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--strong); min-width: 4.5ch; text-align: right; }
+.timer__clock.is-idle { color: var(--muted); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font-weight: 700; font-size: .9375rem; }
+.btn--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn--quiet { background: transparent; }
+.btn:hover { border-color: var(--accent); }
+
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-block: 4px 10px; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: 0 0 auto; display: grid; gap: 0; text-align: left; padding: 8px 14px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface); min-height: 52px; }
+.tab__name { font-weight: 700; font-size: .9375rem; color: var(--strong); white-space: nowrap; }
+.tab__meta { font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); }
+.tab[aria-selected="true"] .tab__name, .tab[aria-selected="true"] .tab__meta { color: var(--accent-ink); }
+.tab__dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); margin-left: 6px; vertical-align: middle; }
+
+.progress { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; }
+.progress__track { flex: 1; height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.progress__fill { height: 100%; width: 0; background: var(--accent); border-radius: inherit; transition: width .3s ease, background .3s; }
+.progress__fill.is-done { background: var(--good); }
+.progress__text { font-size: .8125rem; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---- package head ---- */
+main { padding-block: 20px 64px; }
+.pkg__title { font-family: var(--font-display); font-stretch: 112%; font-weight: 800; font-size: clamp(1.6rem, 1.2rem + 2vw, 2.2rem); line-height: 1.1; color: var(--strong); margin: 0 0 6px; text-wrap: balance; }
+.pkg__meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: .9375rem; margin: 0 0 14px; }
+.pkg__meta strong { color: var(--fg); }
+.pkg__summary { margin: 0 0 18px; color: var(--fg); max-width: 65ch; }
+
+.addons { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 14px 16px; margin-bottom: 14px; }
+.addons__title { margin: 0 0 4px; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.addons__hint { margin: 0 0 10px; font-size: .875rem; color: var(--muted); }
+.addons__list { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--raised); font-weight: 600; font-size: .9375rem; }
+.pill[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--strong); }
+.pill__box { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--muted); display: grid; place-items: center; }
+.pill[aria-pressed="true"] .pill__box { background: var(--accent); border-color: var(--accent); }
+.pill__box svg { width: 12px; height: 12px; opacity: 0; }
+.pill[aria-pressed="true"] .pill__box svg { opacity: 1; }
+.pill__extra { font-size: .8125rem; color: var(--muted); font-weight: 500; }
+
+details.why { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); margin-bottom: 26px; }
+details.why summary { list-style: none; cursor: pointer; padding: 14px 16px; font-weight: 700; color: var(--strong); display: flex; justify-content: space-between; align-items: center; min-height: 48px; }
+details.why summary::-webkit-details-marker { display: none; }
+details.why summary::after { content: "+"; font-size: 1.4rem; line-height: 1; color: var(--muted); }
+details.why[open] summary::after { content: "–"; }
+.why__body { padding: 0 16px 16px; }
+.why__body ul { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; }
+.why__body li { max-width: 65ch; }
+.why__body b { color: var(--strong); }
+
+/* ---- phases ---- */
+.phases { display: grid; gap: 26px; }
+.phase__head { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin-bottom: 10px; }
+.phase__num { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; background: var(--raised); border: 1px solid var(--line); color: var(--strong); font-variant-numeric: tabular-nums; }
+.phase.is-done .phase__num { background: var(--good); border-color: var(--good); color: var(--bg); }
+.phase__name { margin: 0; font-family: var(--font-display); font-stretch: 110%; font-weight: 750; font-size: 1.2rem; color: var(--strong); line-height: 1.2; }
+.phase__goal { display: block; font-family: var(--font-body); font-stretch: 100%; font-weight: 500; font-size: .8125rem; color: var(--muted); margin-top: 2px; }
+.phase__count { font-size: .8125rem; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.phase__count .lap { display: block; font-weight: 600; color: var(--good); }
+.phase__count .lap.is-over { color: var(--warn); }
+
+.steps { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); overflow: hidden; }
+.step + .step { border-top: 1px solid var(--line); }
+.step__btn { width: 100%; display: grid; grid-template-columns: 30px 1fr; gap: 14px; align-items: start; text-align: left; padding: 15px 16px; background: transparent; border: 0; min-height: 60px; }
+.step__btn:hover { background: var(--raised); }
+.step__box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--muted); display: grid; place-items: center; transition: background .15s, border-color .15s; margin-top: 1px; }
+.step__box svg { width: 16px; height: 16px; stroke: var(--accent-ink); opacity: 0; transform: scale(.6); transition: opacity .15s, transform .2s; }
+.step__text { min-width: 0; display: grid; gap: 4px; }
+.step__label { font-weight: 600; color: var(--strong); }
+.step__tip { font-size: .875rem; color: var(--muted); line-height: 1.45; }
+.tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: .6875rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; vertical-align: 2px; border: 1px solid currentColor; }
+.tag--pro { color: var(--muted); }
+.tag--addon { color: var(--accent-strong); }
+.step.is-checked .step__box { background: var(--accent); border-color: var(--accent); }
+.step.is-checked .step__box svg { opacity: 1; transform: scale(1); }
+.step.is-checked .step__label { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 2px; }
+.step.is-checked .step__tip { display: none; }
+.step--addon { background: var(--accent-soft); }
+
+/* ---- finish panel + history ---- */
+.done { margin-top: 28px; border: 1px solid var(--good); background: var(--good-soft); border-radius: var(--r); padding: 18px 16px; }
+.done h2 { margin: 0 0 4px; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; color: var(--strong); }
+.done p { margin: 0 0 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.history { margin-top: 32px; }
+.history h2 { margin: 0 0 8px; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.history ol { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.history li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; font-variant-numeric: tabular-nums; }
+.history li + li { border-top: 1px solid var(--line); }
+.history .t { font-weight: 700; color: var(--strong); }
+.history .over { color: var(--warn); }
+.history .under { color: var(--good); }
+.history__empty { color: var(--muted); font-size: .9375rem; margin: 0; }
+.foot { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .9375rem; }
+.legend { font-size: .8125rem; color: var(--muted); margin: 0 0 12px; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <div class="bar__top">
+      <p class="brand">Daywon Detailing<small>Job checklist</small></p>
+      <div class="timer">
+        <span class="timer__clock is-idle" id="clock" aria-live="off">0:00</span>
+        <button type="button" class="btn btn--primary" id="timer-btn">Start job</button>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Packages" id="tabs"></div>
+    <div class="progress">
+      <div class="progress__track" aria-hidden="true"><div class="progress__fill" id="fill"></div></div>
+      <span class="progress__text" id="progress-text">0 of 0</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main" role="tabpanel"></main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     CHECKLISTS
+     kind: "pkg"  = listed in the package on the website
+           "pro"  = routine step that keeps the job fast and safe
+     addon: show only when one of these add-ons is turned on
+     Phases are in working order. Targets (minutes) are a starting goal
+     for building speed; adjust them as you learn your pace.
+  ------------------------------------------------------------------ */
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+  function s(id, t, tip, kind, addon) { return { id: id, t: t, tip: tip || "", kind: kind || "pkg", addon: addon || null }; }
+
+  var EXTRACT_CARPET = ["carpet-extraction", "carpet-seat-extraction"];
+  var EXTRACT_SEATS = ["seat-extraction", "carpet-seat-extraction"];
+
+  var setupFull = function (n) { return { name: "Arrive & set up", goal: "Know the car, protect yourself, stage gear", min: n, steps: [
+    s("walk", "Walk around the vehicle with the customer", "Point out scratches, dents, stains, and smells before you start. Ask what matters most to them today.", "pro"),
+    s("photos-before", "Take before photos", "Four corners outside, then front seats, back seats, and trunk.", "pro"),
+    s("stage", "Stage your gear in the order you'll use it", "Tools you need first go closest to the car. Fewer trips back to the truck saves the most time.", "pro"),
+    s("trash", "Remove trash and personal items", "Bag the customer's things and set them aside so nothing gets lost or wet.", "pro"),
+    s("mats-out", "Pull all floor mats out", "Lay them on a clean surface. You'll clean them while the interior is open.", "pro")
+  ]}; };
+
+  var PACKAGES = [
+    {
+      id: "exterior-only", name: "Exterior Only Detail", short: "Exterior Only", price: 25, duration: "30 min", target: 30,
+      summary: "A complete exterior wash, no interior work.",
+      addOns: ["spray-wax", "tire-shine"],
+      phases: [
+        { name: "Arrive & set up", goal: "Check the paint and stage wash gear", min: 4, steps: [
+          s("walk", "Walk around the vehicle with the customer", "Point out scratches, chips, and dents before you wash.", "pro"),
+          s("photos-before", "Take before photos", "All four corners and the wheels.", "pro"),
+          s("stage", "Set up buckets, mitts, and wheel brushes", "Wash bucket and rinse bucket. Keep wheel tools separate from paint tools.", "pro"),
+          s("cool", "Check that panels are cool to the touch", "Hot paint dries soap and leaves spots. Work in shade when you can.", "pro")
+        ]},
+        { name: "Wheels & tires first", goal: "Dirtiest part first so it can't splash clean paint", min: 8, steps: [
+          s("wheels", "Spray wheels, tires, and wheel wells with cleaner", "One wheel at a time so cleaner doesn't dry on the rim.", "pro"),
+          s("wheel-scrub", "Scrub tires, rims, and wheel faces", "Tire brush on rubber, soft brush on faces and barrels. Rinse each wheel when done."),
+        ]},
+        { name: "Wash", goal: "Top to bottom, clean water every panel", min: 12, steps: [
+          s("prewash", "Pre-wash to loosen dirt and road grime", "Foam or pre-wash spray from the top down. Let it dwell 2–3 minutes, but don't let it dry."),
+          s("rinse-1", "Rinse the whole vehicle top to bottom", "Pushes off the loose grit before you touch the paint.", "pro"),
+          s("contact", "Contact hand wash", "Roof, glass, hood, upper sides, then lower panels last. Rinse the mitt in the rinse bucket after each panel."),
+          s("rinse-2", "Final rinse", "Top down. Open-hose sheet rinse leaves less water to dry.", "pro"),
+          s("dry", "Dry the vehicle and wipe the door jambs", "Blow out mirrors, grille, and trim gaps so they don't drip later.", "pro")
+        ]},
+        { name: "Protect & finish", goal: "Add-ons, glass, final check", min: 6, steps: [
+          s("wax", "Apply spray wax", "On dry, cool paint. One panel at a time, spread thin, buff off with a fresh towel.", "pkg", ["spray-wax"]),
+          s("shine", "Apply tire shine", "Last, after wax, so towels don't drag dressing onto paint. Wipe off any sling.", "pkg", ["tire-shine"]),
+          s("glass-out", "Clean exterior glass and mirrors", "Glass goes last so wax or water spots don't land on it after.", "pro"),
+          s("final", "Final walkaround and after photos", "Check for drips, missed spots, and soap in the gaps. Show the customer.", "pro")
+        ]}
+      ]
+    },
+    {
+      id: "interior-only", name: "Interior Only Detail", short: "Interior Only", price: 50, duration: "30 min", target: 30,
+      summary: "A thorough interior clean, no exterior wash.",
+      addOns: ["carpet-extraction", "seat-extraction", "carpet-seat-extraction"],
+      phases: [
+        setupFull(4),
+        { name: "Dry work", goal: "Get all the loose dirt out before anything gets wet", min: 8, steps: [
+          s("blow", "Tornador blowout of carpets, seat seams, vents, cracks, and crevices", "Top to bottom: vents and dash first, then seats, then carpets, so debris falls to the floor you haven't vacuumed yet."),
+          s("vac", "Thorough vacuum of carpets, seats, trunk/cargo area, and accessible areas", "Front to back, top down. Slide seats all the way forward, then back."),
+          s("vac-mats", "Vacuum the floor mats", "Shake them out first. Rubber mats can be scrubbed and set out to dry.")
+        ]},
+        { name: "Wet work", goal: "Start what needs to dwell or dry first", min: 13, steps: [
+          s("spot", "Spot treat carpet and seat stains", "Spray stains first so the cleaner dwells while you do the next steps."),
+          s("ex-carpet", "Carpet extraction", "Do it now so carpets dry longest. Leave doors open while you work.", "pkg", EXTRACT_CARPET),
+          s("ex-seats", "Seat extraction", "Test a hidden spot first. Don't oversaturate.", "pkg", EXTRACT_SEATS),
+          s("steam", "Steam clean applicable interior surfaces", "Cup holders, vents, console, door handles, pedals."),
+          s("wipe", "Wipe down dash, console, door panels, cup holders, and trim", "After steam and extraction, so any splatter gets wiped up."),
+          s("rails", "Detail seat rails, door pockets, and crevices", "Brush and vacuum together. This is what customers notice.")
+        ]},
+        { name: "Finish", goal: "Glass last, then hand off", min: 5, steps: [
+          s("glass-in", "Clean interior windows and screens", "Last, so dust and spray from the other steps don't land on clean glass. Screens: dry microfiber or a screen-safe cleaner only."),
+          s("mats-in", "Put the floor mats back in", "", "pro"),
+          s("final", "Final check and after photos", "Sit in each seat and look around. Leave windows cracked if anything is damp.", "pro")
+        ]}
+      ]
+    },
+    {
+      id: "express-refresh", name: "Express Refresh", short: "Express Refresh", price: 75, duration: "1 hr", target: 60,
+      summary: "Quick inside-and-out maintenance clean for lightly dirty, regularly kept cars.",
+      addOns: ["spray-wax", "tire-shine", "carpet-extraction", "seat-extraction", "carpet-seat-extraction"],
+      phases: [
+        setupFull(5),
+        { name: "Interior", goal: "Dry clean, top to bottom", min: 20, steps: [
+          s("blow", "Tornador blowout of loose dust and debris", "Vents and dash first, then seats, then carpets and cracks."),
+          s("vac", "Vacuum carpets, floor mats, seats, trunk/cargo area, and crevices", "Front to back, top down. Do the mats on the ground while they're out."),
+          s("ex-carpet", "Carpet extraction", "Do it now so carpets dry during the exterior wash.", "pkg", EXTRACT_CARPET),
+          s("ex-seats", "Seat extraction", "Test a hidden spot first. Leave doors open to air out.", "pkg", EXTRACT_SEATS),
+          s("wipe", "Light wipe-down of accessible surfaces", "Dash, console, door panels, cup holders. One damp towel, one dry towel.")
+        ]},
+        { name: "Exterior", goal: "Wheels first, then the body top to bottom", min: 25, steps: [
+          s("wheels", "Clean tires and rims", "Do these first so brake dust doesn't splash onto clean paint."),
+          s("rinse-1", "Rinse the whole vehicle top to bottom", "", "pro"),
+          s("contact", "Contact hand wash", "Roof down, lower panels last. Rinse the mitt after each panel."),
+          s("dry", "Rinse, dry, and wipe the door jambs", "", "pro"),
+          s("wax", "Apply spray wax", "On dry, cool paint. Spread thin and buff off.", "pkg", ["spray-wax"]),
+          s("shine", "Apply tire shine", "After the wax. Wipe off sling.", "pkg", ["tire-shine"])
+        ]},
+        { name: "Finish", goal: "Glass last, then hand off", min: 10, steps: [
+          s("glass-in", "Clean interior windows and screens", "Last, so nothing lands on clean glass. Screens: dry microfiber only."),
+          s("glass-out", "Clean exterior glass and mirrors", "", "pro"),
+          s("mats-in", "Put the floor mats back in", "", "pro"),
+          s("final", "Final walkaround and after photos", "Check jambs, glass, and wheels once more. Show the customer.", "pro")
+        ]}
+      ]
+    },
+    {
+      id: "full-interior-exterior", name: "Full Interior + Exterior Detail", short: "Full Detail", price: 150, duration: "2 hr", target: 120,
+      summary: "A thorough inside reset plus a complete exterior wash. Wax and tire shine are add-ons only.",
+      addOns: ["spray-wax", "tire-shine", "carpet-extraction", "seat-extraction", "carpet-seat-extraction"],
+      phases: [
+        setupFull(10),
+        { name: "Interior dry work", goal: "Get all the loose dirt out before anything gets wet", min: 20, steps: [
+          s("blow", "Tornador blowout of carpets, seat seams, vents, cracks, and crevices", "Top to bottom: headliner edges, vents, dash, seats, then carpets."),
+          s("vac", "Thorough vacuum of carpets, mats, seats, trunk/cargo area, and accessible areas", "Front to back. Slide seats forward, then back, to reach under them.")
+        ]},
+        { name: "Interior wet work", goal: "Start dwell and drying time early", min: 35, steps: [
+          s("spot", "Spot treat carpet and seat stains", "Spray first so it dwells while you steam."),
+          s("ex-carpet", "Carpet extraction", "Now, so carpets dry during the exterior. Leave doors open.", "pkg", EXTRACT_CARPET),
+          s("ex-seats", "Seat extraction", "Test a hidden spot first. Don't oversaturate.", "pkg", EXTRACT_SEATS),
+          s("steam", "Steam clean applicable interior surfaces", "Cup holders, vents, console, handles, pedals."),
+          s("wipe", "Wipe down dash, console, door panels, cup holders, and trim", "After steam and extraction, so any splatter gets wiped up."),
+          s("rails", "Detail seat rails, door pockets, and crevices", "Brush and vacuum together.")
+        ]},
+        { name: "Exterior", goal: "Wheels first, then the body top to bottom", min: 40, steps: [
+          s("wheels", "Clean and scrub tires, rims, and wheel faces", "First, so brake dust can't splash onto clean paint. One wheel at a time."),
+          s("mats-wash", "Scrub and rinse rubber mats", "Set them in the sun to dry while you wash.", "pro"),
+          s("prewash", "Pre-wash to loosen dirt and road grime", "Top down, dwell 2–3 minutes, don't let it dry."),
+          s("rinse-1", "Rinse the whole vehicle top to bottom", "", "pro"),
+          s("contact", "Contact hand wash", "Roof down, lower panels last. Rinse the mitt after each panel."),
+          s("dry", "Final rinse, dry, and wipe the door jambs", "Blow out mirrors and trim gaps.", "pro"),
+          s("wax", "Apply spray wax", "On dry, cool paint. Spread thin and buff off.", "pkg", ["spray-wax"]),
+          s("shine", "Apply tire shine", "After the wax. Wipe off sling.", "pkg", ["tire-shine"])
+        ]},
+        { name: "Finish", goal: "Glass last, then hand off", min: 15, steps: [
+          s("glass-in", "Clean interior windows and screens", "Last, so dust and spray don't land on clean glass."),
+          s("glass-out", "Clean exterior glass and mirrors", "", "pro"),
+          s("mats-in", "Put the floor mats back in", "", "pro"),
+          s("final", "Final walkaround and after photos", "Sit in each seat and look around. Check jambs and wheels.", "pro")
+        ]}
+      ]
+    },
+    {
+      id: "deep-restoration", name: "Deep Restoration Detail", short: "Deep Restoration", price: 250, duration: "3 hr", target: 180,
+      summary: "The deepest clean: heavy dirt, stains, and neglected carpets or seats. Includes extraction, wax, and tire shine.",
+      addOns: [],
+      phases: [
+        setupFull(10),
+        { name: "Interior dry work", goal: "Pull out sand and embedded debris first", min: 30, steps: [
+          s("blow", "Detailed Tornador blowout of carpet fibers, seat seams, cracks, and crevices", "Top to bottom. Work each carpet section slowly to lift sand to the surface."),
+          s("vac", "Intensive vacuum of carpets, floor mats, seats, trunk/cargo area, and crevices", "Go over carpets twice in crossing directions. Slide seats forward, then back.")
+        ]},
+        { name: "Interior wet work", goal: "Extraction first so it dries the longest", min: 70, steps: [
+          s("bomber", "Carpet bomber treatment on carpets and mats", "Spray and agitate with a brush. Let it dwell while you set up the extractor."),
+          s("spot", "Spot treat stains", "Seats and anything the bomber didn't lift. Let it dwell."),
+          s("ex-carpet", "Carpet extraction", "Carpets and carpet mats. Doors open, mats out in the sun."),
+          s("ex-seats", "Cloth seat extraction (when applicable and safe for the material)", "Test a hidden spot first. Skip leather and anything that bleeds color."),
+          s("steam", "Steam clean applicable interior surfaces", "Cup holders, vents, console, handles, pedals, seat belt buckles."),
+          s("wipe", "Thorough wipe-down of dash, door panels, console, cup holders, trim, and touch points", "After extraction, so any splatter gets wiped up."),
+          s("rails", "Deep clean seat rails, door pockets, cup holders, and crevices", "Brush, steam, and vacuum together.")
+        ]},
+        { name: "Exterior", goal: "Wheels first, protect last", min: 50, steps: [
+          s("wheels", "Pressure wash and scrub tires and rims", "First, so brake dust can't splash onto clean paint."),
+          s("prewash", "Pre-wash", "Top down, dwell 2–3 minutes, don't let it dry."),
+          s("rinse-1", "Rinse the whole vehicle top to bottom", "", "pro"),
+          s("contact", "Contact hand wash", "Roof down, lower panels last. Rinse the mitt after each panel."),
+          s("dry", "Final rinse, dry, and wipe the door jambs", "", "pro"),
+          s("wax", "Apply spray wax", "On dry, cool paint. One panel at a time, buff off."),
+          s("shine", "Apply tire shine", "After the wax. Wipe off sling.")
+        ]},
+        { name: "Finish", goal: "Glass last, explain drying time", min: 20, steps: [
+          s("glass-in", "Clean interior windows and screens", "Last, so nothing lands on clean glass."),
+          s("glass-out", "Clean exterior glass and mirrors", "", "pro"),
+          s("check-damp", "Check carpets and seats for dampness", "Press a towel down. Run a fan or crack the windows if still wet.", "pro"),
+          s("mats-in", "Put the floor mats back in once dry", "", "pro"),
+          s("final", "Final walkaround and after photos", "Tell the customer carpets may stay a little damp and to leave windows cracked if they can.", "pro")
+        ]}
+      ]
+    }
+  ];
+
+  var ADDONS = {
+    "spray-wax": { name: "Spray wax", extra: "" },
+    "tire-shine": { name: "Tire shine", extra: "" },
+    "carpet-extraction": { name: "Carpet extraction", extra: "+15 min" },
+    "seat-extraction": { name: "Seat extraction", extra: "+15 min" },
+    "carpet-seat-extraction": { name: "Carpet + seat extraction", extra: "+35 min" }
+  };
+  var ADDON_MIN = { "carpet-extraction": 15, "seat-extraction": 15, "carpet-seat-extraction": 35 };
+
+  var WHY = [
+    "<b>Top to bottom, front to back.</b> Dust falls. Clean high spots first so dirt lands on areas you haven't done yet.",
+    "<b>Dry work before wet work.</b> Blow out and vacuum first. Wet dirt turns to mud and smears.",
+    "<b>Start the slow stuff early.</b> Spray stain treatment and carpet bomber first so they soak while you do other work, and extract early so carpets dry during the exterior wash.",
+    "<b>Wheels before paint.</b> Wheel cleaner and brake dust splash. Do wheels first and the body wash rinses away any overspray.",
+    "<b>Wipe-down after steam and extraction.</b> Those steps splatter onto plastics, so one wipe at the end does the job once.",
+    "<b>Glass goes last.</b> Every other step throws dust, spray, or water. Clean glass at the end and it stays clean.",
+    "<b>Stage your gear in order.</b> Every trip back to the truck costs a minute. Lay tools out in the order on this list."
+  ];
+
+  /* ------------------------------------------------------------------ state */
+  var KEY = "daywon-checklist-v1";
+  var state = load();
+  function load() {
+    try { var v = JSON.parse(localStorage.getItem(KEY)); if (v && v.jobs) return v; } catch (e) {}
+    return { current: null, jobs: {}, history: [] };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function job(id) {
+    if (!state.jobs[id]) state.jobs[id] = { checked: {}, addOns: [], startedAt: null, finishedAt: null, laps: {}, logged: false };
+    return state.jobs[id];
+  }
+
+  var hashId = (location.hash || "").replace("#", "");
+  var current = PACKAGES.some(function (p) { return p.id === hashId; }) ? hashId
+    : (state.current && PACKAGES.some(function (p) { return p.id === state.current; }) ? state.current : "express-refresh");
+
+  /* ------------------------------------------------------------------ helpers */
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function pkg() { return PACKAGES.filter(function (p) { return p.id === current; })[0]; }
+  function visible(step, j) { return !step.addon || step.addon.some(function (a) { return j.addOns.indexOf(a) > -1; }); }
+  function fmt(ms) {
+    var t = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), sec = t % 60;
+    return h ? h + ":" + String(m).padStart(2, "0") + ":" + String(sec).padStart(2, "0") : m + ":" + String(sec).padStart(2, "0");
+  }
+  function mins(ms) { return Math.round(ms / 60000); }
+  function targetFor(p, j) {
+    var extra = 0; j.addOns.forEach(function (a) { extra += ADDON_MIN[a] || 0; });
+    return p.target + extra;
+  }
+  function counts(p, j) {
+    var total = 0, done = 0;
+    p.phases.forEach(function (ph) { ph.steps.forEach(function (st) { if (visible(st, j)) { total++; if (j.checked[st.id]) done++; } }); });
+    return { total: total, done: done };
+  }
+  function inProgress(id) {
+    var j = state.jobs[id]; if (!j) return false;
+    return !!j.startedAt && !j.finishedAt || Object.keys(j.checked).some(function (k) { return j.checked[k]; }) && !j.finishedAt;
+  }
+
+  /* ------------------------------------------------------------------ render */
+  function renderTabs() {
+    $("tabs").innerHTML = PACKAGES.map(function (p) {
+      var sel = p.id === current;
+      return '<button type="button" role="tab" class="tab" id="tab-' + p.id + '" aria-selected="' + sel + '" aria-controls="main" tabindex="' + (sel ? 0 : -1) + '" data-pkg="' + p.id + '">' +
+        '<span class="tab__name">' + esc(p.short) + (inProgress(p.id) && !sel ? '<span class="tab__dot" title="In progress"></span>' : "") + '</span>' +
+        '<span class="tab__meta">$' + p.price + '+ · ' + esc(p.duration) + '</span></button>';
+    }).join("");
+  }
+
+  function renderMain() {
+    var p = pkg(), j = job(p.id);
+    var html = '<h1 class="pkg__title">' + esc(p.name) + '</h1>' +
+      '<p class="pkg__meta"><span>Starting at <strong>$' + p.price + '</strong></span><span>Booked time <strong>' + esc(p.duration) + '</strong></span><span>Your goal <strong>' + targetFor(p, j) + ' min</strong></span></p>' +
+      '<p class="pkg__summary">' + esc(p.summary) + '</p>';
+
+    if (p.addOns.length) {
+      html += '<section class="addons" aria-labelledby="addons-h"><h2 class="addons__title" id="addons-h">Add-ons on this job</h2>' +
+        '<p class="addons__hint">Turn on what the customer booked. Their steps show up in the right spot.</p><div class="addons__list">' +
+        p.addOns.map(function (a) {
+          var on = j.addOns.indexOf(a) > -1;
+          return '<button type="button" class="pill" id="addon-' + a + '" aria-pressed="' + on + '" data-addon="' + a + '"><span class="pill__box">' + CHECK.replace("<svg", '<svg stroke="currentColor" style="stroke:var(--accent-ink)"') + '</span>' + esc(ADDONS[a].name) +
+            (ADDONS[a].extra ? '<span class="pill__extra">' + ADDONS[a].extra + '</span>' : "") + '</button>';
+        }).join("") + '</div></section>';
+    }
+
+    html += '<details class="why" id="why"><summary>Why this order</summary><div class="why__body"><ul>' +
+      WHY.map(function (w) { return "<li>" + w + "</li>"; }).join("") + '</ul></div></details>';
+
+    html += '<p class="legend">Tap a step to check it off. Steps marked <span class="tag tag--pro">Routine</span> aren\'t listed in the package but keep the job quick and clean.</p>';
+
+    html += '<div class="phases">';
+    p.phases.forEach(function (ph, i) {
+      var steps = ph.steps.filter(function (st) { return visible(st, j); });
+      if (!steps.length) return;
+      var done = steps.filter(function (st) { return j.checked[st.id]; }).length;
+      var complete = done === steps.length;
+      var lap = j.laps[i];
+      var lapHtml = "";
+      if (lap != null) {
+        var prev = 0; for (var k = i - 1; k >= 0; k--) { if (j.laps[k] != null) { prev = j.laps[k]; break; } }
+        var took = mins(lap - prev);
+        lapHtml = '<span class="lap' + (took > ph.min ? " is-over" : "") + '">' + took + ' of ' + ph.min + ' min</span>';
+      }
+      html += '<section class="phase' + (complete ? " is-done" : "") + '" aria-labelledby="ph-' + i + '">' +
+        '<div class="phase__head"><span class="phase__num" aria-hidden="true">' + (i + 1) + '</span>' +
+        '<h2 class="phase__name" id="ph-' + i + '">' + esc(ph.name) + '<span class="phase__goal">' + esc(ph.goal) + ' · goal ' + ph.min + ' min</span></h2>' +
+        '<span class="phase__count">' + done + '/' + steps.length + lapHtml + '</span></div><ul class="steps">' +
+        steps.map(function (st) {
+          var on = !!j.checked[st.id];
+          var tag = st.addon ? '<span class="tag tag--addon">Add-on</span>' : (st.kind === "pro" ? '<span class="tag tag--pro">Routine</span>' : "");
+          return '<li class="step' + (on ? " is-checked" : "") + (st.addon ? " step--addon" : "") + '">' +
+            '<button type="button" class="step__btn" id="step-' + st.id + '" role="checkbox" aria-checked="' + on + '" data-step="' + st.id + '" data-phase="' + i + '">' +
+            '<span class="step__box" aria-hidden="true">' + CHECK.replace("<svg", '<svg stroke="currentColor"') + '</span>' +
+            '<span class="step__text"><span class="step__label">' + esc(st.t) + tag + '</span>' + (st.tip ? '<span class="step__tip">' + esc(st.tip) + '</span>' : "") + '</span></button></li>';
+        }).join("") + '</ul></section>';
+    });
+    html += '</div>';
+
+    var c = counts(p, j);
+    if (c.total && c.done === c.total) {
+      var took = j.startedAt && j.finishedAt ? j.finishedAt - j.startedAt : null;
+      var goal = targetFor(p, j);
+      html += '<section class="done" aria-live="polite"><h2>Job complete</h2><p>' +
+        (took != null ? 'Finished in <strong>' + fmt(took) + '</strong> against a ' + goal + ' min goal. ' + (mins(took) <= goal ? "Nice and quick." : "Check which phase ran long above.") : "Every step is checked off. Start the timer next time to track your speed.") +
+        '</p><div class="row"><button type="button" class="btn btn--primary" id="new-job">Start a new job</button></div></section>';
+    }
+
+    var hist = state.history.filter(function (h) { return h.pkg === p.id; }).slice(0, 5);
+    html += '<section class="history" aria-labelledby="hist-h"><h2 id="hist-h">Recent times for this package</h2>' +
+      (hist.length ? '<ol>' + hist.map(function (h) {
+        var cls = h.min <= h.goal ? "under" : "over";
+        return '<li><span>' + esc(h.date) + '</span><span><span class="t">' + h.min + ' min</span> <span class="' + cls + '">(' + (h.min <= h.goal ? "" : "+") + (h.min - h.goal) + ')</span></span></li>';
+      }).join("") + '</ol>' : '<p class="history__empty">No timed jobs yet. Tap Start job when you begin, and your finish time is saved here when every box is checked.</p>') +
+      '</section>';
+
+    html += '<div class="foot"><div class="confirm" id="reset-zone"><button type="button" class="btn btn--quiet" id="reset">Clear this checklist</button></div></div>';
+
+    $("main").innerHTML = html;
+    $("main").setAttribute("aria-labelledby", "tab-" + p.id);
+    renderBar();
+  }
+
+  function renderBar() {
+    var p = pkg(), j = job(p.id), c = counts(p, j);
+    var pct = c.total ? Math.round(c.done / c.total * 100) : 0;
+    $("fill").style.width = pct + "%";
+    $("fill").classList.toggle("is-done", c.total > 0 && c.done === c.total);
+    $("progress-text").textContent = c.done + " of " + c.total + " done";
+    var btn = $("timer-btn");
+    if (j.finishedAt) { btn.textContent = "Done"; btn.disabled = true; }
+    else if (j.startedAt) { btn.textContent = "Running"; btn.disabled = true; }
+    else { btn.textContent = "Start job"; btn.disabled = false; }
+    btn.className = "btn " + (j.startedAt ? "btn--quiet" : "btn--primary");
+    tick();
+  }
+
+  function tick() {
+    var j = job(current), el = $("clock");
+    if (!j.startedAt) { el.textContent = "0:00"; el.classList.add("is-idle"); return; }
+    el.classList.remove("is-idle");
+    el.textContent = fmt((j.finishedAt || Date.now()) - j.startedAt);
+  }
+  setInterval(tick, 1000);
+
+  /* ------------------------------------------------------------------ wake lock: keep the phone screen on during a job */
+  var lock = null;
+  function wake() {
+    var j = job(current);
+    if (!j.startedAt || j.finishedAt || lock || !navigator.wakeLock) return;
+    navigator.wakeLock.request("screen").then(function (l) { lock = l; l.addEventListener("release", function () { lock = null; }); }).catch(function () {});
+  }
+  function unwake() { if (lock) { lock.release().catch(function () {}); lock = null; } }
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") wake(); });
+
+  /* ------------------------------------------------------------------ actions */
+  function selectPkg(id, focus) {
+    current = id; state.current = id; save();
+    try { history.replaceState(null, "", "#" + id); } catch (e) {}
+    renderTabs(); renderMain(); window.scrollTo(0, 0);
+    if (focus) $("tab-" + id).focus();
+    var t = $("tab-" + id); if (t && t.scrollIntoView) t.scrollIntoView({ block: "nearest", inline: "nearest" });
+    unwake(); wake();
+  }
+
+  function toggleStep(id, phaseIdx) {
+    var p = pkg(), j = job(p.id);
+    if (!j.startedAt && !j.checked[id]) j.startedAt = Date.now();  // first check starts the clock
+    j.checked[id] = !j.checked[id];
+    var ph = p.phases[phaseIdx];
+    var steps = ph.steps.filter(function (st) { return visible(st, j); });
+    var all = steps.every(function (st) { return j.checked[st.id]; });
+    if (all && j.laps[phaseIdx] == null && j.startedAt) j.laps[phaseIdx] = Date.now();
+    if (!all) delete j.laps[phaseIdx];
+    finishCheck(p, j);
+    save(); renderTabs(); renderMain();
+    var b = $("step-" + id); if (b) b.focus({ preventScroll: true });
+    wake();
+  }
+
+  function finishCheck(p, j) {
+    var c = counts(p, j);
+    if (c.total && c.done === c.total) {
+      if (!j.finishedAt) j.finishedAt = Date.now();
+      if (!j.logged && j.startedAt) {
+        var d = new Date(j.finishedAt);
+        state.history.unshift({ pkg: p.id, min: mins(j.finishedAt - j.startedAt), goal: targetFor(p, j),
+          date: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " · " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) });
+        state.history = state.history.slice(0, 50);
+        j.logged = true;
+      }
+      unwake();
+    } else if (j.finishedAt) {
+      j.finishedAt = null;  // unchecked something after finishing: keep timing
+    }
+  }
+
+  function resetJob() {
+    state.jobs[current] = { checked: {}, addOns: [], startedAt: null, finishedAt: null, laps: {}, logged: false };
+    save(); unwake(); renderTabs(); renderMain(); window.scrollTo(0, 0);
+  }
+
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pkg]"); if (b) selectPkg(b.getAttribute("data-pkg"));
+  });
+  $("tabs").addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    var i = PACKAGES.findIndex(function (p) { return p.id === current; });
+    i = (i + (e.key === "ArrowRight" ? 1 : -1) + PACKAGES.length) % PACKAGES.length;
+    e.preventDefault(); selectPkg(PACKAGES[i].id, true);
+  });
+
+  $("timer-btn").addEventListener("click", function () {
+    var j = job(current); if (j.startedAt) return;
+    j.startedAt = Date.now(); save(); renderBar(); renderTabs(); wake();
+  });
+
+  $("main").addEventListener("click", function (e) {
+    var st = e.target.closest("[data-step]");
+    if (st) { toggleStep(st.getAttribute("data-step"), +st.getAttribute("data-phase")); return; }
+    var ad = e.target.closest("[data-addon]");
+    if (ad) {
+      var j = job(current), a = ad.getAttribute("data-addon"), i = j.addOns.indexOf(a);
+      if (i > -1) j.addOns.splice(i, 1); else j.addOns.push(a);
+      finishCheck(pkg(), j); save(); renderMain();
+      var nb = $("addon-" + a); if (nb) nb.focus({ preventScroll: true });
+      return;
+    }
+    if (e.target.closest("#new-job")) { resetJob(); return; }
+    if (e.target.closest("#reset")) {
+      $("reset-zone").innerHTML = '<span>Clear every check and the timer for this package?</span>' +
+        '<button type="button" class="btn btn--primary" id="reset-yes">Yes, clear it</button><button type="button" class="btn btn--quiet" id="reset-no">Keep it</button>';
+      $("reset-no").focus();
+      return;
+    }
+    if (e.target.closest("#reset-yes")) { resetJob(); return; }
+    if (e.target.closest("#reset-no")) { renderMain(); }
+  });
+
+  selectPkg(current);
+})();
+</script>
+</body>
+</html>
