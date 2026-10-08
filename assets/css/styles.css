@@ -690,7 +690,7 @@ html.js-motion .hero__title.is-sheen::after {
 /* Compare chart */
 .compare-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-6); }
 .compare-head .link-arrow { color: var(--blue-300); }
-.compare { overflow-x: auto; border: 1px solid var(--ink-700); border-radius: var(--r-md); background: var(--ink-950); -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.compare { position: relative; overflow-x: auto; border: 1px solid var(--ink-700); border-radius: var(--r-md); background: var(--ink-950); -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 .compare:focus-visible { outline: 2px solid var(--blue-300); outline-offset: 3px; }
 .compare__hint { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3); font-size: var(--fs-sm); color: var(--ink-300); }
 .compare__hint .icon { width: 1rem; height: 1rem; }
